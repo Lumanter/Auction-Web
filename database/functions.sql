@@ -8,7 +8,7 @@ DECLARE
 BEGIN
 	SELECT improvementPercent, minIncrement 
 	INTO _improvementPercent, _minIncrement 
-	FROM AuctionParameter ORDER BY date LIMIT 1;
+	FROM AuctionParameter ORDER BY date DESC LIMIT 1;
 	
 	IF NOT EXISTS(SELECT * FROM Auction WHERE id = _auctionId) THEN
 		RETURN 0;
@@ -149,3 +149,14 @@ BEGIN
 	END IF;
 END;
 $$ LANGUAGE PLPGSQL;
+
+
+
+
+CREATE FUNCTION getAuctionParameters() 
+RETURNS SETOF AuctionParameter AS $$
+	SELECT * 
+	FROM AuctionParameter 
+	ORDER BY date DESC 
+	LIMIT 1;
+$$ LANGUAGE SQL;

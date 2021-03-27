@@ -17,8 +17,9 @@
                 <ul class="nav navbar-nav navbar-right">
                     <% if (!user) { %>
                         <li><a href="/login">Login</a></li>
-                        <li><a href="/register">Register</a></li>
+                        <li><a href="/users/new">Register</a></li>
                     <% } else { %>
+                        <li><a href="/params">Parameters</a></li>
                         <li><a href="/logout">Logout</a></li>
                     <% } %>
                 </ul>
