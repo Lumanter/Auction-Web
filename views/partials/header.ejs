@@ -17,9 +17,14 @@
                 <ul class="nav navbar-nav navbar-right">
                     <% if (!user) { %>
                         <li><a href="/login">Login</a></li>
-                        <li><a href="/users/new">Register</a></li>
-                    <% } else { %>
+                    <% } else if (user.isadmin) { %>
+                        <li><a href="/users/<%= user.id %>"><%= user.nickname %></a></li>
+                        <li><a href="/users">Users</a></li>
                         <li><a href="/params">Parameters</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    <% } else { %>
+                        <li><a href="/users/<%= user.id %>"><%= user.nickname %></a></li>
+                        <li><a href="/auctions">Auctions</a></li>
                         <li><a href="/logout">Logout</a></li>
                     <% } %>
                 </ul>

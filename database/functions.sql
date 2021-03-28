@@ -160,3 +160,25 @@ RETURNS SETOF AuctionParameter AS $$
 	ORDER BY date DESC 
 	LIMIT 1;
 $$ LANGUAGE SQL;
+
+
+
+
+CREATE FUNCTION getUsers() 
+RETURNS SETOF Users AS $$
+	SELECT * FROM Users ORDER BY nickname;
+$$ LANGUAGE SQL;
+
+
+
+
+CREATE FUNCTION getUser(_id INT) 
+RETURNS SETOF Users AS $$
+BEGIN
+	IF NOT EXISTS(SELECT * FROM Users WHERE id = _id) THEN
+		RAISE 'Error: User with id % doesn''t exists.', _id;
+	ELSE 
+		RETURN QUERY SELECT * FROM Users WHERE id = _id;
+	END IF;
+END;
+$$ LANGUAGE PLPGSQL;

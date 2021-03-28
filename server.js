@@ -47,7 +47,25 @@ function checkIsLogged(req, res, next) {
 
 function checkIsNotLogged(req, res, next) {  
     if (req.isAuthenticated()) {  // middleware to redirect logged users
-        res.redirect("/auctions");
+        res.redirect(`/users/${req.user.id}`);
+    } else {
+        return next();
+    }
+};
+
+
+function checkIsAdmin(req, res, next) {  
+    if (req.user.isadmin) {  // middleware to redirect non admin users
+        return next();
+    } else {
+        res.redirect(`/users/${req.user.id}`);
+    }
+};
+
+
+function checkIsNotAdmin(req, res, next) {  
+    if (req.user.isadmin) {  // middleware to redirect admin users
+        res.redirect(`/users/${req.user.id}`);
     } else {
         return next();
     }
@@ -60,12 +78,12 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/users/new', checkIsNotLogged, (req, res) => {
-    res.render('register');
+app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
+    res.render('users/new');
 });
 
 
-app.post('/users/new', async (req, res) => {
+app.post('/users/new', [checkIsLogged, checkIsAdmin], async (req, res) => {
     const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;  // take form data
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
     const isAdmin = (req.body.isAdmin !== undefined);
@@ -78,7 +96,7 @@ app.post('/users/new', async (req, res) => {
         res.redirect('/');
     } catch (error) {
         req.flash("error", error.message);
-        res.render('register', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, phoneNumber, homeNumber});  // pass data to restore user form
+        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, phoneNumber, homeNumber});  // pass data to restore user form
     }
 });
 
@@ -89,7 +107,7 @@ app.get('/login', checkIsNotLogged, (req, res) => {
 
 
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/auctions',
+    successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true  // pass messages from passportConfig to flash('error')
 }));
@@ -107,7 +125,7 @@ app.get('/logout', checkIsLogged, (req, res) => {
 });
 
 
-app.get('/params', checkIsLogged, async (req, res) => {
+app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let currentParams = null;  // set current params if available
     try {
         const results = await db.query('SELECT * FROM getAuctionParameters()');
@@ -132,11 +150,36 @@ app.post('/params', async (req, res) => {
 });
 
 
+app.get('/users', [checkIsLogged, checkIsAdmin], async (req, res) => {
+    let users = {};
+    try {
+        const results = await db.query('SELECT * FROM getUsers()');
+        users = results.rows;
+    } catch (error) {
+        res.send('An error ocurred retrieving the users');
+    }
+    res.render('users', {users: users});
+});
+
+
+app.get('/users/:id', checkIsLogged, async (req, res) => {
+    try {
+        const userId = (isNaN(parseInt(req.params.id)) ? null : parseInt(req.params.id));
+        const results = await db.query('SELECT * FROM getUser($1)', [userId]);
+        const shownUser = results.rows[0];
+        res.render('users/show', {shownUser: shownUser});
+    } catch (error) {
+        req.flash("error", error.message);
+        res.redirect('/users');
+    }
+});
+
+
 app.get("*", function (req, res) {
     res.send("Error 404: Page not found");
 });
 
 
 app.listen(3000, () => {
-    console.log('Server at port 3000...')
+    console.log('Auction Web server at localhost:3000...')
 });

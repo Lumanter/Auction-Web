@@ -1,0 +1,69 @@
+<%- include('../partials/header'); %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <h2><%= shownUser.nickname %></h2>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div  class="thumbnail">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Admin</label>
+                </div>
+                <div class="col-xs-6">
+                    <p><%= shownUser.isadmin %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Email</label>
+                </div>
+                <div class="col-xs-6">
+                    <p><%= shownUser.email %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>First Name</label>
+                </div>
+                <div class="col-xs-6">
+                    <p><%= shownUser.firstname %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Last Name</label>
+                </div>
+                <div class="col-xs-6">
+                    <p><%= shownUser.lastname %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Phone Number</label>
+                </div>
+                <div class="col-xs-6">
+                    <p><%= shownUser.phonenumber %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Home Number</label>
+                </div>
+                <div class="col-xs-6">
+                    <p><%= shownUser.homenumber %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+       
+<%- include('../partials/footer'); %>
