@@ -3,8 +3,58 @@
 <div class="container">
     <header class="jumbotron">
         <h2>Auctions</h2>
-        <a class="btn btn-primary btn-lg" href="/auctions/new">create</a>
+        <% if (!user.isadmin) { %>
+            <a class="btn btn-primary btn-lg" href="/auctions/new">create</a>
+        <% } %>
     </header>
+
+    <div class="form-row">
+        <form action='/auctions' method="POST">
+            <div class="form-group col-xs-2">
+                <label for="filterBy">Filter By</label>
+                <select id="filterBy" name="filterBy" class="form-control">
+                    <option value='category'>Category</option>
+                    <option value='subcategory'>Subcategory</option>
+                </select>
+            </div>
+
+            <div class="form-group col-xs-4">
+                <label for="category">Category</label>
+                <select id="category" name="category" class="form-control">
+                    <option value='NULL'>All</option>
+                    <% if (Object.keys(categories).length !== 0) { %>
+                    <% categories.forEach((category) => { %>
+                        <option value='<%= category.id %>'><%= category.name %></option>
+                    <% }); %>
+                <% } %>
+                </select>
+            </div>
+
+            <div class="form-group col-xs-4">
+                <label for="subcategory">Subcategory</label>
+                <select id="subcategory" name="subcategory" class="form-control">
+                <% if (Object.keys(subcategories).length !== 0) { %>
+                    <% subcategories.forEach((subcategory) => { %>
+                        <option value='<%= subcategory.id %>'><%= subcategory.name %></option>
+                    <% }); %>
+                <% } %>
+                </select>
+            </div>
+
+            <div class="form-group col-xs-2">
+                <button class="btn btn-lg btn-info" type="submit">Filter</button>
+            </div>
+        <form>
+    </div>
+
+    <% if (Object.keys(auctions).length !== 0) { %>
+        <ul class="list-group">
+            <a style="visibility: hidden">_</a>  <!-- hide first element -->
+            <% auctions.forEach((auction) => { %>
+                <a href="/auctions/<%= auction.id %>" class="list-group-item list-group-item-action"><%= auction.itemname %>  [closes <%= auction.enddate.toISOString().split('T')[0] %>]</a>
+            <% }); %>
+        </ul>
+    <% } %>
 </div>
 
 <%- include('../partials/footer'); %>

@@ -362,12 +362,3 @@ BEGIN
 		END IF;
 	END LOOP;
 END;$$
-
-CALL updateClosedAuctions();
-
-SELECT id, itemName, endDate, isClosed, bestBidId FROM Auction WHERE id = 5;
-SELECT * FROM SellerReview; SELECT * FROM BuyerReview;
-
-UPDATE Auction SET isClosed = FALSE WHERE id = 5;
-DELETE FROM SellerReview WHERE auctionId = 5;
-DELETE FROM BuyerReview WHERE auctionId = 5;

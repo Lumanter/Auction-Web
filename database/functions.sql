@@ -27,7 +27,7 @@ BEGIN
 				INTO _bestBidAmount
 				FROM Bid B
 				JOIN Auction A  
-				ON A.id = 1 AND B.id = A.bestBidId;
+				ON A.id = _auctionId AND B.id = A.bestBidId;
 				
 				RETURN _bestBidAmount + (_bestBidAmount * _improvementPercent);
 			END IF;
@@ -51,14 +51,13 @@ RETURNS SETOF Auction AS $$
 		A.isClosed = FALSE AND 
 		A.subCategoryId = COALESCE(_subCategoryId, A.subCategoryId) AND
 		S.categoryId = COALESCE(_categoryId, S.categoryId)
-		ORDER BY endDate DESC;
+		ORDER BY endDate ASC;
 $$ LANGUAGE SQL;
 
 
 
 
-CREATE FUNCTION getAuctionBids(
-	_auctionId    INT) 
+CREATE FUNCTION getAuctionBids(_auctionId    INT) 
 RETURNS SETOF Bid AS $$
 	SELECT *
 	FROM Bid
@@ -69,8 +68,7 @@ $$ LANGUAGE SQL;
 
 
 
-CREATE FUNCTION getSellerHistory(
-	_userId INT) 
+CREATE FUNCTION getSellerHistory(_userId INT) 
 RETURNS TABLE (
 	auctionId     INT,
 	itemName      VARCHAR(60),
@@ -99,8 +97,7 @@ $$ LANGUAGE SQL;
 
 
 
-CREATE FUNCTION getBuyerHistory(
-	_userId INT) 
+CREATE FUNCTION getBuyerHistory(_userId INT) 
 RETURNS TABLE (
 	auctionId     INT,
 	itemName      VARCHAR(60),
@@ -185,24 +182,78 @@ $$ LANGUAGE PLPGSQL;
 
 
 
+CREATE FUNCTION getActiveCategories() 
+RETURNS SETOF Category AS $$
+	SELECT C.id, C.name
+	FROM Category C
+	JOIN SubCategory S
+		ON C.id = S.categoryId
+	JOIN Auction A
+		ON A.subCategoryId = S.id 
+			AND A.isClosed = FALSE
+	GROUP BY C.id, C.name
+	ORDER BY C.name;
+$$ LANGUAGE SQL;
+
+
+
+
+CREATE FUNCTION getActiveSubCategories() 
+RETURNS SETOF SubCategory AS $$
+	SELECT S.id, S.categoryId, S.name
+	FROM SubCategory S
+	JOIN Auction A
+		ON A.subCategoryId = S.id
+			AND A.isClosed = FALSE
+	GROUP BY S.id, S.categoryId, S.name
+	ORDER BY S.name;
+$$ LANGUAGE SQL;
+
+
 
 CREATE FUNCTION getSubCategories() 
 RETURNS SETOF SubCategory AS $$
-	SELECT * FROM SubCategory ORDER BY name;
+	SELECT * FROM SubCategory ORDER By name
 $$ LANGUAGE SQL;
 
 
 
 
-CREATE  FUNCTION getActiveAuctions() 
-RETURNS SETOF Auction AS $$
-	SELECT * FROM Auction WHERE NOW() < endDate ORDER BY endDate ASC;
-$$ LANGUAGE SQL;
-
-
-
-
-CREATE FUNCTION getAuction(_id INT) 
-RETURNS SETOF Auction AS $$
-	SELECT * FROM Auction WHERE id = _id;
-$$ LANGUAGE SQL;
+CREATE FUNCTION getAuctionInfo(_id INT) 
+RETURNS TABLE (
+	auctionId       INT,
+	itemName        VARCHAR(60),
+	subcategoryName VARCHAR(50),
+	sellerId        INT,
+	sellerNickname  VARCHAR(50),
+	basePrice       NUMERIC(14, 2),
+	currentPrice    NUMERIC(14, 2),
+	minBid          NUMERIC(14, 2),
+	startDate       TIMESTAMP,
+	endDate         TIMESTAMP,
+	itemDescription VARCHAR(120),
+	deliveryDetails VARCHAR(120),
+	itemPhoto       BYTEA,
+	isClosed        BOOL,
+	winnerId        INT
+) AS $$
+BEGIN
+	IF NOT EXISTS(SELECT * FROM Auction WHERE id = _id) THEN
+		RAISE 'Error: Auction doesn''t exists.';
+	ELSE 
+		RETURN QUERY 
+		SELECT A.id, A.itemName, S.name, A.userId, U.nickname,
+			   A.basePrice, COALESCE(B.amount, A.basePrice), 
+			   getMinBid(A.id), A.startDate, A.endDate, 
+			   A.itemDescription, A.deliveryDetails, A.itemPhoto, 
+			   A.isClosed, B.userId
+		FROM Auction A
+		JOIN SubCategory S
+			ON A.subCategoryId = S.id AND A.id = _id
+		JOIN Users U
+			ON U.id = A.userId
+		LEFT JOIN Bid B
+			ON A.bestBidId = B.id;
+	END IF;
+END;
+$$ LANGUAGE PLPGSQL;

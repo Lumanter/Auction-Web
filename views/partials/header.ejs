@@ -19,6 +19,7 @@
                         <li><a href="/login">Login</a></li>
                     <% } else if (user.isadmin) { %>
                         <li><a href="/users/<%= user.id %>"><%= user.nickname %></a></li>
+                        <li><a href="/auctions">Auctions</a></li>
                         <li><a href="/users">Users</a></li>
                         <li><a href="/params">Parameters</a></li>
                         <li><a href="/logout">Logout</a></li>

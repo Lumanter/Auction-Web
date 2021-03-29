@@ -1,18 +1,17 @@
-const express = require('express');
-const app = express();
-const session = require('express-session');
-const flash = require('express-flash');
-const passport = require('passport');
-const fileUpload = require('express-fileupload');
+const express = require('express'),
+    app = express(),
+    session = require('express-session'),
+    flash = require('express-flash'),
+    passport = require('passport'),
+    fileUpload = require('express-fileupload');
 
 const {initializePassport} = require('./passportConfig');
 const {db} = require('./dbConfig');
 const {checkIsLogged, checkIsNotLogged, checkIsAdmin, checkIsNotAdmin} = require('./middleware');
 
-
+    
 initializePassport(passport);  // use custom strategy
-
-
+    
 // MIDDLEWARES
 app.set("view engine", "ejs");  // use ejs
 app.use(express.urlencoded({extended: true}))  // middleware to receive form data in (req.body.param)
@@ -26,7 +25,7 @@ app.use(session({
 }));
 
 app.use(flash());  // enable req.flash method
-
+    
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -104,7 +103,7 @@ app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
 });
 
 
-app.post('/users/new', async (req, res) => {
+app.post('/users', async (req, res) => {
     const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;  // take form data
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
     const isAdmin = (req.body.isAdmin !== undefined);
@@ -165,10 +164,36 @@ app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
 });
 
 
-app.get('/auctions', checkIsLogged, (req, res) => {
-    res.render('auctions');
+app.get('/auctions', checkIsLogged, async (req, res) => {
+    let auctions = {},
+        categories = {},
+        subcategories = {};
+    try {
+        auctions = (await db.query('SELECT * FROM getActiveAuctions(NULL, NULL)')).rows;
+        categories = (await db.query('SELECT * FROM getActiveCategories()')).rows;
+        subcategories = (await db.query('SELECT * FROM getActiveSubCategories()')).rows;
+    } catch (error) {}
+    res.render('auctions', {auctions, categories, subcategories});
 });
 
+
+app.post('/auctions', async (req, res) => {
+    const filterByCategory = (req.body.filterBy === 'category');
+    const categoryId = (filterByCategory) ? req.body.category : 'NULL';
+    const subCategoryId = (!filterByCategory) ? req.body.subcategory : 'NULL';
+
+    let auctions = {},
+        categories = {},
+        subcategories = {};
+    try {
+        categories = (await db.query('SELECT * FROM getActiveCategories()')).rows;
+        subcategories = (await db.query('SELECT * FROM getActiveSubCategories()')).rows;
+        auctions = (await db.query(`SELECT * FROM getActiveAuctions(${categoryId}, ${subCategoryId})`)).rows;
+    } catch (error) {
+        console.log(error.message);
+    }
+    res.render('auctions', {auctions, categories, subcategories});
+});
 
 app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
     let subcategories = {};
@@ -205,6 +230,19 @@ app.post('/auctions/new', async (req, res) => {
         res.render('auctions/new', {error: req.flash("error"), subcategories, itemName, basePrice, itemDescription, deliveryDetails, endDate: endDate.replace(' ', 'T')});
     }
     
+});
+
+
+app.get('/auctions/:id', async (req, res) => {
+    try {
+        const auctionId = (isNaN(parseInt(req.params.id)) ? null : parseInt(req.params.id));
+        const auctionInfo = (await db.query('SELECT * FROM getAuctionInfo($1)', [auctionId])).rows[0];
+        console.log(auctionInfo);
+        res.send('coming soon...');
+    } catch (error) {
+        req.flash("error", error.message);
+        res.redirect('/auctions');
+    }
 });
 
 

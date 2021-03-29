@@ -37,7 +37,7 @@ INSERT INTO Users VALUES
 
 INSERT INTO Auction (itemName, subCategoryId, userId, bestBidId, basePrice, startDate, endDate, itemDescription, deliveryDetails, itemPhoto, isClosed, itemWasSold) VALUES
 ('Nintendo Wii', 67, 202720532, NULL, 30000, '2020-01-22 00:00:00-06', '2020-05-22 00:00:00-06', 'Bought in 2008, excellent state', 'To deliver in San José', NULL, TRUE, TRUE),
-('Lady Datejust Rolex', 10, 202720532, NULL, 350000, NOW(), '2021-05-22 00:00:00-06', 'Limited edition deluxe watch', 'To deliver in San José', NULL, FALSE, NULL);
+('Lady Datejust Rolex', 20, 202720532, NULL, 350000, NOW(), '2021-05-22 00:00:00-06', 'Limited edition deluxe watch', 'To deliver in San José', NULL, FALSE, NULL);
 
 INSERT INTO Bid (auctionId, userId, amount, date) VALUES
 (1, 201620611, 40000, '2020-02-10 11:00:00-06');
