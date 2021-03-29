@@ -41,7 +41,6 @@ END;$$
 
 CREATE PROCEDURE updateUser(
 	_id          BIGINT, 
-	_isAdmin     BOOL,
 	_nickname    VARCHAR(20),
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
@@ -51,7 +50,7 @@ CREATE PROCEDURE updateUser(
 	_homeNumber  VARCHAR(8))
 LANGUAGE PLPGSQL AS $$
 BEGIN
-    IF ((_id IS NULL) OR (_isAdmin IS NULL) OR (COALESCE(TRIM(_nickname),'') = '') OR 
+    IF ((_id IS NULL) OR (COALESCE(TRIM(_nickname),'') = '') OR 
 		(COALESCE(TRIM(_password),'') = '') OR (COALESCE(TRIM(_email),'') = '')  OR 
 		(COALESCE(TRIM(_firstName),'') = '') OR (COALESCE(TRIM(_lastName),'') = '')) THEN
 		RAISE 'Error: Null parameter, only phone numbers are optional.';
@@ -67,9 +66,6 @@ BEGIN
 	
 	ELSIF EXISTS(SELECT * FROM Users WHERE email = _email AND id != _id) THEN
 		RAISE 'Error: Email already in use, please try another.';
-
-	ELSIF ((SELECT isAdmin FROM Users WHERE id = _id) != _isAdmin) THEN
-		RAISE 'Error: Admins can''t be updated to participants, or vice versa.';
 	
 	ELSE
 		BEGIN
@@ -219,6 +215,9 @@ BEGIN
 	
 	ELSIF NOT EXISTS(SELECT * FROM Auction WHERE id = _auctionId) THEN
 		RAISE 'Error: Auction doesn''t exists.';
+
+	ELSIF ((SELECT userId FROM Auction WHERE id = _auctionId) = _userId) THEN
+		RAISE 'Error: Auction owner can''t bid.';
 	
 	ELSIF ((SELECT endDate FROM Auction WHERE id = _auctionId) >= NOW()) THEN
 		RAISE 'Error: Auction ended.';

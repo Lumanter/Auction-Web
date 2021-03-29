@@ -104,7 +104,7 @@ app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
 });
 
 
-app.post('/users/new', [checkIsLogged, checkIsAdmin], async (req, res) => {
+app.post('/users/new', async (req, res) => {
     const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;  // take form data
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
     const isAdmin = (req.body.isAdmin !== undefined);
@@ -115,7 +115,7 @@ app.post('/users/new', [checkIsLogged, checkIsAdmin], async (req, res) => {
     try {
         await db.query(procedureCall, procedureParams);
         req.flash("success", `User ${nickname} created`);
-        res.redirect('/');
+        res.redirect(`/users/${id}`);
     } catch (error) {
         req.flash("error", error.message);
         res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, phoneNumber, homeNumber});  // pass data to restore user form
@@ -134,6 +134,35 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
     }
 });
 
+
+app.get('/users/:id/edit', [checkIsLogged, checkIsAdmin], async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const editUser = (await db.query('SELECT * FROM getUser($1)', [userId])).rows[0];
+        res.render('users/edit', {...editUser});
+    } catch (error) {
+        req.flash("error", error.message);
+        res.redirect('/users');
+    }
+});
+
+
+app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
+    const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;
+    const id = req.params.id;
+
+    const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6, $7, $8)`;
+    const procedureParams = [id, nickname, password, email, firstName, lastName, phoneNumber, homeNumber];
+    
+    try {
+        await db.query(procedureCall, procedureParams);
+        req.flash("success", `User ${nickname} updated`);
+        res.redirect(`/users/${id}`);
+    } catch (error) {
+        req.flash("error", error.message);
+        res.redirect(`/users/${id}/edit`)
+    }
+});
 
 
 app.get('/auctions', checkIsLogged, (req, res) => {

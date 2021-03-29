@@ -2,13 +2,22 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-3 align-items-center">
             <h2><%= shownUser.nickname %></h2>
         </div>
     </div>
     
     <div class="col-md-9">
         <div  class="thumbnail">
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Id</label>
+                </div>
+                <div class="col-xs-6">
+                    <p><%= shownUser.id %></p>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-xs-6">
                     <label>Admin</label>
@@ -62,6 +71,10 @@
                     <p><%= shownUser.homenumber %></p>
                 </div>
             </div>
+
+            <% if (user.isadmin) { %>
+                <a class="btn btn-primary btn-md" href="/users/<%= shownUser.id %>/edit">edit</a>
+            <% } %>
         </div>
     </div>
 </div>
