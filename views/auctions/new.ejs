@@ -1,0 +1,56 @@
+<%- include('../partials/header'); %>
+
+<div class="container">
+    <div class="row">
+        <div style="width: 40%; margin: 25px auto;">
+            <% const auctionDefined = (typeof itemName != 'undefined'); %>  <!-- if auction item name defined all auction data is available, fill the form -->
+            <form action="/auctions/new" method="POST" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <h5>Item Name</h5>
+                    <input id="itemName" type="text" class="form-control" name="itemName" placeholder="Item Name" <%- (auctionDefined) ? `value='${itemName}'` : '' %> maxLength="60" required />
+                </div>
+
+                <div class="form-group">
+                    <h5>Subcategory</h5>
+                    <select class="form-control" id="subCategoryId" name="subCategoryId">
+                        <% subcategories.forEach((subcategory) => { %>
+                            <option value=<%= subcategory.id %>><%= subcategory.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <h5>Base Price (₡)</h5>
+                    <input id="basePrice" type="number" class="form-control" name="basePrice" placeholder="₡Base Price" <%- (auctionDefined) ? `value='${basePrice}'` : '' %> required />
+                </div>
+
+                <div class="form-group">
+                    <h5>Item Description</h5>
+                    <textarea class="form-control" id="itemDescription" name="itemDescription" placeholder="Item Description" rows="3" maxLength="120" required ><%- (auctionDefined) ? itemDescription : '' %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <h5>Delivery Details</h5>
+                    <textarea class="form-control" id="deliveryDetails" name="deliveryDetails" placeholder="Delivery Details" rows="3" maxLength="120" required ><%- (auctionDefined) ? deliveryDetails : '' %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <h5>End Date</h5>
+                    <input class="form-control" type="datetime-local" id="endDate" name="endDate" <%- (auctionDefined) ? `value='${endDate}'` : '' %> required >
+                </div>
+
+                <div class="form-group">
+                    <h5>Item Photo (max 25KB)</h5>
+                    <input class="form-control" type="file" id="itemPhoto" name="itemPhoto" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Create Auction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer'); %>

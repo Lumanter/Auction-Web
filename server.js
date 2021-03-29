@@ -1,11 +1,13 @@
 const express = require('express');
 const app = express();
-const {db} = require('./dbConfig');
-const bcrypt = require('bcrypt');
 const session = require('express-session');
 const flash = require('express-flash');
 const passport = require('passport');
+const fileUpload = require('express-fileupload');
+
 const {initializePassport} = require('./passportConfig');
+const {db} = require('./dbConfig');
+const {checkIsLogged, checkIsNotLogged, checkIsAdmin, checkIsNotAdmin} = require('./middleware');
 
 
 initializePassport(passport);  // use custom strategy
@@ -13,14 +15,15 @@ initializePassport(passport);  // use custom strategy
 
 // MIDDLEWARES
 app.set("view engine", "ejs");  // use ejs
-app.use(express.urlencoded({extended: false}))  // middleware to receive form data in (req.body.param)
+app.use(express.urlencoded({extended: true}))  // middleware to receive form data in (req.body.param)
+
+app.use(fileUpload());  // set middleware to upload item image
 
 app.use(session({
     secret: 'secret',
     resave: false,  // don't resave session if info hasn't changed
     saveUninitialized: false  // 
 }));
-
 
 app.use(flash());  // enable req.flash method
 
@@ -36,70 +39,10 @@ app.use((req, res, next) => {  // pass ejs local variables on route getters or r
 });
 
 
-function checkIsLogged(req, res, next) {  
-    if (req.isAuthenticated()) {  // middleware to redirect non logged users
-        return next();
-    } else {
-        res.redirect("/login");
-    }
-};
-
-
-function checkIsNotLogged(req, res, next) {  
-    if (req.isAuthenticated()) {  // middleware to redirect logged users
-        res.redirect(`/users/${req.user.id}`);
-    } else {
-        return next();
-    }
-};
-
-
-function checkIsAdmin(req, res, next) {  
-    if (req.user.isadmin) {  // middleware to redirect non admin users
-        return next();
-    } else {
-        res.redirect(`/users/${req.user.id}`);
-    }
-};
-
-
-function checkIsNotAdmin(req, res, next) {  
-    if (req.user.isadmin) {  // middleware to redirect admin users
-        res.redirect(`/users/${req.user.id}`);
-    } else {
-        return next();
-    }
-};
-
-
 // ROUTES
 app.get('/', (req, res) => {
     res.redirect('/login');
 });
-
-
-app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
-    res.render('users/new');
-});
-
-
-app.post('/users/new', [checkIsLogged, checkIsAdmin], async (req, res) => {
-    const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;  // take form data
-    const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
-    const isAdmin = (req.body.isAdmin !== undefined);
-
-    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
-    const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName, phoneNumber, homeNumber];
-    try {
-        await db.query(procedureCall, procedureParams);
-        req.flash("success", `User ${nickname} created`);
-        res.redirect('/');
-    } catch (error) {
-        req.flash("error", error.message);
-        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, phoneNumber, homeNumber});  // pass data to restore user form
-    }
-});
-
 
 app.get('/login', checkIsNotLogged, (req, res) => {
     res.render('login');
@@ -111,11 +54,6 @@ app.post('/login', passport.authenticate('local', {
     failureRedirect: '/login',
     failureFlash: true  // pass messages from passportConfig to flash('error')
 }));
-
-
-app.get('/auctions', checkIsLogged, (req, res) => {
-    res.render('auctions');
-});
 
 
 app.get('/logout', checkIsLogged, (req, res) => {
@@ -153,8 +91,7 @@ app.post('/params', async (req, res) => {
 app.get('/users', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let users = {};
     try {
-        const results = await db.query('SELECT * FROM getUsers()');
-        users = results.rows;
+        users = (await db.query('SELECT * FROM getUsers()')).rows;
     } catch (error) {
         res.send('An error ocurred retrieving the users');
     }
@@ -162,16 +99,83 @@ app.get('/users', [checkIsLogged, checkIsAdmin], async (req, res) => {
 });
 
 
+app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
+    res.render('users/new');
+});
+
+
+app.post('/users/new', [checkIsLogged, checkIsAdmin], async (req, res) => {
+    const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;  // take form data
+    const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
+    const isAdmin = (req.body.isAdmin !== undefined);
+
+    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+    const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName, phoneNumber, homeNumber];
+    
+    try {
+        await db.query(procedureCall, procedureParams);
+        req.flash("success", `User ${nickname} created`);
+        res.redirect('/');
+    } catch (error) {
+        req.flash("error", error.message);
+        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, phoneNumber, homeNumber});  // pass data to restore user form
+    }
+});
+
+
 app.get('/users/:id', checkIsLogged, async (req, res) => {
     try {
         const userId = (isNaN(parseInt(req.params.id)) ? null : parseInt(req.params.id));
-        const results = await db.query('SELECT * FROM getUser($1)', [userId]);
-        const shownUser = results.rows[0];
+        const shownUser = (await db.query('SELECT * FROM getUser($1)', [userId])).rows[0];
         res.render('users/show', {shownUser: shownUser});
     } catch (error) {
         req.flash("error", error.message);
         res.redirect('/users');
     }
+});
+
+
+
+app.get('/auctions', checkIsLogged, (req, res) => {
+    res.render('auctions');
+});
+
+
+app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
+    let subcategories = {};
+    try {
+        subcategories = (await db.query('SELECT * FROM getSubCategories()')).rows;
+    } catch (error) {}
+    res.render('auctions/new', {subcategories});
+});
+
+
+app.post('/auctions/new', async (req, res) => {
+    const {itemName, subCategoryId, basePrice, itemDescription, deliveryDetails} = req.body;
+    const endDate = req.body.endDate.replace('T', ' ');
+    const userId = req.user.id;
+    let itemPhoto = null;
+    if (req.files) {
+        itemPhoto = req.files.itemPhoto.data;  // image as blob object (accepted in PostgreSQL BYTEA field)
+    }
+    
+    const procedureCall = 'CALL createAuction($1, $2, $3, $4, $5, $6, $7, $8);'
+    const procedureParams = [itemName, subCategoryId, userId, basePrice, endDate, itemDescription, deliveryDetails, itemPhoto];
+
+    try {
+        await db.query(procedureCall, procedureParams);
+        req.flash("success", `Auction ${itemName} created`);
+        res.redirect('/auctions');
+    } catch (error) {
+        let subcategories = {};
+        try {
+            subcategories = (await db.query('SELECT * FROM getSubCategories()')).rows;
+        } catch (error) {}
+
+        req.flash("error", error.message);
+        res.render('auctions/new', {error: req.flash("error"), subcategories, itemName, basePrice, itemDescription, deliveryDetails, endDate: endDate.replace(' ', 'T')});
+    }
+    
 });
 
 

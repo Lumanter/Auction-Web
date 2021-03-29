@@ -7,10 +7,12 @@
             <form action="/register" method="POST">
 
                 <div class="form-group">
+                    <h5>Id</h5>
                     <input id="id" type="text" class="form-control" name="id" placeholder="Id" <%- (userDefined && id) ? `value='${id}'` : '' %> required />
                 </div>
 
                 <div class="form-group">
+                    <h5>Nickname</h5>
                     <input  id="nickname" type="text" class="form-control" name="nickname" placeholder="Nickname" <%- (userDefined) ? `value='${nickname}'` : '' %> required  maxLength="20" />
                 </div>
 
@@ -20,26 +22,32 @@
                 </div>
 
                 <div class="form-group">
+                    <h5>Email</h5>
                     <input id="email" type="email" class="form-control" name="email" placeholder="Email" <%- (userDefined) ? `value='${email}'` : '' %> required />
                 </div>
 
                 <div class="form-group">
+                    <h5>Password</h5>
                     <input id="password" type="password" class="form-control"  name="password" placeholder="Password" required maxLength="15" /> 
                 </div>
 
                 <div class="form-group">
+                    <h5>First Name</h5>
                     <input id="firstName" type="text" class="form-control" name="firstName" placeholder="First Name" <%- (userDefined) ? `value='${firstName}'` : '' %> required maxLength="50" />
                 </div>
 
                 <div class="form-group">
+                    <h5>Last Name</h5>
                     <input id="lastName" type="text" class="form-control" name="lastName" placeholder="Last Name"  <%- (userDefined) ? `value='${lastName}'` : '' %> required maxLength="50" />
                 </div>
 
                 <div class="form-group">
+                    <h5>Phone Number</h5>
                     <input id="phoneNumber" type="text" class="form-control" name="phoneNumber" maxLength="8" placeholder="Phone Number" <%- (userDefined) ? `value='${phoneNumber}'` : '' %> />
                 </div>
 
                 <div class="form-group">
+                    <h5>Home Number</h5>
                     <input id="homeNumber" type="text" class="form-control" name="homeNumber" maxLength="8" placeholder="Home Number" <%- (userDefined) ? `value='${homeNumber}'` : '' %> />
                 </div>
 

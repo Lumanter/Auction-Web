@@ -16,6 +16,7 @@
             <div class="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <% if (!user) { %>
+                        <li><a href="/auctions/new">Create Auction</a></li>
                         <li><a href="/login">Login</a></li>
                     <% } else if (user.isadmin) { %>
                         <li><a href="/users/<%= user.id %>"><%= user.nickname %></a></li>

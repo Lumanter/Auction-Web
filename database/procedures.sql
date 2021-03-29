@@ -190,9 +190,6 @@ BEGIN
 	ELSIF (_endDate <= NOW()) THEN
 		RAISE 'Error: Finishing date has to be higher than current date.';
 	
-	ELSIF NOT EXISTS(SELECT * FROM Users WHERE id = _userId) THEN
-		RAISE 'Error: User doesn''t exists.';
-	
 	ELSIF (_itemPhoto IS NOT NULL AND LENGTH(_itemPhoto) > 25600) THEN
 		RAISE 'Error: Item photo can''t exceed 25KB.';
 	

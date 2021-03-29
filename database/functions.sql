@@ -182,3 +182,27 @@ BEGIN
 	END IF;
 END;
 $$ LANGUAGE PLPGSQL;
+
+
+
+
+CREATE FUNCTION getSubCategories() 
+RETURNS SETOF SubCategory AS $$
+	SELECT * FROM SubCategory ORDER BY name;
+$$ LANGUAGE SQL;
+
+
+
+
+CREATE  FUNCTION getActiveAuctions() 
+RETURNS SETOF Auction AS $$
+	SELECT * FROM Auction WHERE NOW() < endDate ORDER BY endDate ASC;
+$$ LANGUAGE SQL;
+
+
+
+
+CREATE FUNCTION getAuction(_id INT) 
+RETURNS SETOF Auction AS $$
+	SELECT * FROM Auction WHERE id = _id;
+$$ LANGUAGE SQL;
