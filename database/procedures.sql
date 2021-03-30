@@ -267,7 +267,7 @@ END;$$
 CREATE PROCEDURE updateSellerReview(
 	_auctionId INT,
 	_comment   VARCHAR(120),
-	_rating    SMALLINT)
+	_rating    INT)
 LANGUAGE PLPGSQL AS $$
 BEGIN
 	IF (_auctionId IS NULL) THEN
@@ -296,7 +296,7 @@ END;$$
 CREATE PROCEDURE updateBuyerReview(
 	_auctionId   INT,
 	_comment     VARCHAR(120),
-	_rating      SMALLINT,
+	_rating      INT,
 	_itemWasSold BOOL)
 LANGUAGE PLPGSQL AS $$
 BEGIN

@@ -171,8 +171,7 @@ app.get('/auctions', checkIsLogged, async (req, res) => {
         categories = [],
         subcategories = [];
     try {
-        // auctions = (await db.query('SELECT * FROM getActiveAuctions(NULL, NULL)')).rows;
-        auctions = (await db.query('SELECT * FROM Auction ORDER BY endDate ASC')).rows;  // also closed auctions, for temporal testing
+        auctions = (await db.query('SELECT * FROM getActiveAuctions(NULL, NULL)')).rows;
         categories = (await db.query('SELECT * FROM getActiveCategories()')).rows;
         subcategories = (await db.query('SELECT * FROM getActiveSubCategories()')).rows;
     } catch (error) {}
@@ -249,11 +248,10 @@ app.get('/auctions/:id', checkIsLogged, async (req, res) => {
 });
 
 
-app.post('/auctions/:id', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
+app.post('/auctions/:id/bid', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
     const auctionId = req.params.id,
         bidAmount = req.body.bidamount,
         userId = req.user.id;
-    console.log(`auction:${auctionId} user:${userId}`);
     try {
         await db.query(`CALL createBid(${userId}, ${bidAmount}, ${auctionId})`);
         req.flash("success", 'Successful bid!');
@@ -261,6 +259,37 @@ app.post('/auctions/:id', [checkIsLogged, checkIsNotAdmin], async (req, res) => 
         req.flash("error", error.message);
     }
     res.redirect(`/auctions/${auctionId}`);
+});
+
+
+app.post('/auctions/:id/reviewbuyer', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
+    const auctionId = req.params.id,
+        comment = req.body.buyerReviewComment,
+        rating = req.body.buyerReviewRating,
+        itemWasSold = (req.body.buyerReviewItemWasSold !== undefined);
+    try {
+        await db.query('CALL updateBuyerReview($1, $2, $3, $4)', [auctionId, comment, rating, itemWasSold]);
+        req.flash("success", 'Review updated');
+        res.redirect(`/users/${req.body.winnerId}`);
+    } catch (error) {
+        req.flash("error", error.message);
+        res.redirect(`/auctions/${auctionId}`);
+    }
+});
+
+
+app.post('/auctions/:id/reviewseller', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
+    const auctionId = req.params.id,
+        comment = req.body.sellerReviewComment,
+        rating = req.body.sellerReviewRating;
+    try {
+        await db.query('CALL updateSellerReview($1, $2, $3)', [auctionId, comment, rating]);
+        req.flash("success", 'Review updated');
+        res.redirect(`/users/${req.body.sellerId}`);
+    } catch (error) {
+        req.flash("error", error.message);
+        res.redirect(`/auctions/${auctionId}`);
+    }
 });
 
 

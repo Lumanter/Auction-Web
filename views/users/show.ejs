@@ -82,7 +82,7 @@
                                     <% if (bid.sellercomment) { %>
                                         <%= bid.sellercomment %>
                                     <% } %>
-                                    <% if (bid.sellerrating) { %>
+                                    <% if (bid.sellerrating !== null) { %>
                                         (<%= bid.sellerrating %>/5)
                                     <% } %>
                                 <% } %>
@@ -110,13 +110,19 @@
                                         Winned by <a href="/users/<%= auction.buyeruserid %>"><%= auction.buyernickname %></a> for
                                         <br>
                                         <strong>₡<%= auction.amount %></strong>
+                                        
+                                        <% if (auction.itemwassold !== null) { %>
+                                            <br>
+                                            Item sold: <%= auction.itemwassold %>
+                                        <% } %>
+
                                         <% if (auction.buyercomment || auction.buyerrating) { %>
                                             <br>
                                             Buyer review:   
                                             <% if (auction.buyercomment) { %>
                                                 <%= auction.buyercomment %>
                                             <% } %>
-                                            <% if (auction.buyerrating) { %>
+                                            <% if (auction.buyerrating !== null) { %>
                                                 (<%= auction.buyerrating %>/5)
                                             <% } %>
                                         <% }  %>
