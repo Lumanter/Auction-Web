@@ -238,7 +238,7 @@ app.get('/auctions/:id', async (req, res) => {
         const auctionId = (isNaN(parseInt(req.params.id)) ? null : parseInt(req.params.id));
         const auctionInfo = (await db.query('SELECT * FROM getAuctionInfo($1)', [auctionId])).rows[0];
         console.log(auctionInfo);
-        res.send('coming soon...');
+        res.render('auctions/show', {...auctionInfo});
     } catch (error) {
         req.flash("error", error.message);
         res.redirect('/auctions');

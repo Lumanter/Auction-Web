@@ -1,0 +1,21 @@
+<%- include('../partials/header'); %>
+
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-body">
+
+        <% if (itemphoto) { %>
+            <img src="data:image/jpeg;base64,<%= new Buffer.from(itemphoto).toString('base64') %>">
+        <% } %>
+    
+        <h2><%= itemname %></h2>
+        <p><strong>Subcategory:</strong> <%= subcategoryname %></p>
+        <p><strong>Description:</strong> <%= itemdescription %></p>
+        <p><strong>Delivery details:</strong> <%= deliverydetails %></p>
+        <p>[<%= startdate.toISOString().split('T')[0] %>] - [<%= enddate.toISOString().split('T')[0] %>]</p>
+
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer'); %>

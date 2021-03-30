@@ -1,37 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>AuctionWeb</title>    
-        <link rel="stylesheet" type="" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <title>AuctionWeb</title>     
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> 
     </head>
     <body>
 
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">AuctionWeb</a>
-            </div>
+   <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <a class="navbar-brand" href="/">AuctionWeb</a>
 
-            <div class="navbar-collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <% if (!user) { %>
-                        <li><a href="/login">Login</a></li>
-                    <% } else if (user.isadmin) { %>
-                        <li><a href="/users/<%= user.id %>"><%= user.nickname %></a></li>
-                        <li><a href="/auctions">Auctions</a></li>
-                        <li><a href="/users">Users</a></li>
-                        <li><a href="/params">Parameters</a></li>
-                        <li><a href="/logout">Logout</a></li>
-                    <% } else { %>
-                        <li><a href="/users/<%= user.id %>"><%= user.nickname %></a></li>
-                        <li><a href="/auctions">Auctions</a></li>
-                        <li><a href="/logout">Logout</a></li>
-                    <% } %>
-                </ul>
-            </div>
-
-        </div>
+        <ul class="navbar-nav ml-auto">
+            <% if (!user) { %>
+                <a class="nav-item nav-link mx-2" href="/login">Login</a>
+            <% } else if (user.isadmin) { %>
+                <a class="nav-item nav-link mx-2" href="/users/<%= user.id %>"><%= user.nickname %></a>
+                <a class="nav-item nav-link mx-2" href="/auctions">Auctions</a>
+                <a class="nav-item nav-link mx-2" href="/users">Users</a>
+                <a class="nav-item nav-link mx-2" href="/params">Parameters</a>
+                <a class="nav-item nav-link mx-2" href="/logout">Logout</a>
+            <% } else { %>
+                <a class="nav-item nav-link mx-2" href="/users/<%= user.id %>"><%= user.nickname %></a>
+                <a class="nav-item nav-link mx-2" href="/auctions">Auctions</a>
+                <a class="nav-item nav-link mx-2" href="/logout">Logout</a>
+            <% } %>
+        </ul>
     </nav>
 
     <div class="container">  <!-- display flash messages -->

@@ -1,79 +1,60 @@
 <%- include('../partials/header'); %>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-3 align-items-center">
-            <h2><%= shownUser.nickname %></h2>
-        </div>
-    </div>
-    
-    <div class="col-md-9">
-        <div  class="thumbnail">
+<div class="container mt-3" style="width: 70%; margin: 25px auto;">
+    <div class="card">
+        <h5 class="card-header"><%= shownUser.nickname %></h5>
+        <div class="card-body">
             <div class="row">
-                <div class="col-xs-6">
-                    <label>Id</label>
-                </div>
-                <div class="col-xs-6">
-                    <p><%= shownUser.id %></p>
+                <h6 class="col-5 card-title">Id</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.id %></p>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-6">
-                    <label>Admin</label>
-                </div>
-                <div class="col-xs-6">
-                    <p><%= shownUser.isadmin %></p>
+                <h6 class="col-5 card-title">Admin</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.isadmin %></p>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-6">
-                    <label>Email</label>
-                </div>
-                <div class="col-xs-6">
-                    <p><%= shownUser.email %></p>
+                <h6 class="col-5 card-title">Email</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.email %></p>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-6">
-                    <label>First Name</label>
-                </div>
-                <div class="col-xs-6">
-                    <p><%= shownUser.firstname %></p>
+                <h6 class="col-5 card-title">First Name</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.firstname %></p>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-6">
-                    <label>Last Name</label>
-                </div>
-                <div class="col-xs-6">
-                    <p><%= shownUser.lastname %></p>
+                <h6 class="col-5 card-title">Last Name</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.lastname %></p>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-6">
-                    <label>Phone Number</label>
-                </div>
-                <div class="col-xs-6">
-                    <p><%= shownUser.phonenumber %></p>
+                <h6 class="col-5 card-title">Phone Number</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.phonenumber %></p>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-6">
-                    <label>Home Number</label>
-                </div>
-                <div class="col-xs-6">
-                    <p><%= shownUser.homenumber %></p>
+                <h6 class="col-5 card-title">Home Number</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.homenumber %></p>
                 </div>
             </div>
-
+ 
             <% if (user.isadmin) { %>
-                <a class="btn btn-primary btn-md" href="/users/<%= shownUser.id %>/edit">edit</a>
+                <a class="btn btn-outline-info btn-md" href="/users/<%= shownUser.id %>/edit">edit</a>
             <% } %>
         </div>
     </div>

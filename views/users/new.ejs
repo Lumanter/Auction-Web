@@ -6,53 +6,69 @@
             <% const userDefined = (typeof id != 'undefined'); %>  <!-- if user id is defined all user data is available, fill the form -->
             <form action="/users" method="POST">
 
-                <div class="form-group">
-                    <h5>Id</h5>
-                    <input id="id" type="text" class="form-control" name="id" placeholder="Id" <%- (userDefined && id) ? `value='${id}'` : '' %> required />
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Id</span>
+                    </div>
+                    <input id="id" type="text" class="form-control" name="id" <%- (userDefined && id) ? `value='${id}'` : '' %> required />
                 </div>
 
-                <div class="form-group">
-                    <h5>Nickname</h5>
-                    <input  id="nickname" type="text" class="form-control" name="nickname" placeholder="Nickname" <%- (userDefined) ? `value='${nickname}'` : '' %> required  maxLength="20" />
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Nickname</span>
+                    </div>
+                    <input id="nickname" type="text" class="form-control" name="nickname" <%- (userDefined) ? `value='${nickname}'` : '' %> required  maxLength="20" />
                 </div>
 
                 <div class="form-group">
                     <input id="isAdmin" type="checkbox" name="isAdmin" <%- (userDefined && isAdmin) ? "checked" : '' %> />
-                    isAdmin
+                    <label>isAdmin</label>
+                </div>
+
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Email</span>
+                    </div>
+                    <input id="email" type="email" class="form-control" name="email" <%- (userDefined) ? `value='${email}'` : '' %> required />
+                </div>
+
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Password</span>
+                    </div>
+                    <input id="password" type="password" class="form-control"  name="password" required maxLength="15" /> 
+                </div>
+
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">First Name</span>
+                    </div>
+                    <input id="firstName" type="text" class="form-control" name="firstName" <%- (userDefined) ? `value='${firstName}'` : '' %> required maxLength="50" />
+                </div>
+
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Last Name</span>
+                    </div>
+                    <input id="lastName" type="text" class="form-control" name="lastName"  <%- (userDefined) ? `value='${lastName}'` : '' %> required maxLength="50" />
+                </div>
+
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Phone Number</span>
+                    </div>
+                    <input id="phoneNumber" type="text" class="form-control" name="phoneNumber" maxLength="8" <%- (userDefined) ? `value='${phoneNumber}'` : '' %> />
+                </div>
+
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Home Number</span>
+                    </div>
+                    <input id="homeNumber" type="text" class="form-control" name="homeNumber" maxLength="8" <%- (userDefined) ? `value='${homeNumber}'` : '' %> />
                 </div>
 
                 <div class="form-group">
-                    <h5>Email</h5>
-                    <input id="email" type="email" class="form-control" name="email" placeholder="Email" <%- (userDefined) ? `value='${email}'` : '' %> required />
-                </div>
-
-                <div class="form-group">
-                    <h5>Password</h5>
-                    <input id="password" type="password" class="form-control"  name="password" placeholder="Password" required maxLength="15" /> 
-                </div>
-
-                <div class="form-group">
-                    <h5>First Name</h5>
-                    <input id="firstName" type="text" class="form-control" name="firstName" placeholder="First Name" <%- (userDefined) ? `value='${firstName}'` : '' %> required maxLength="50" />
-                </div>
-
-                <div class="form-group">
-                    <h5>Last Name</h5>
-                    <input id="lastName" type="text" class="form-control" name="lastName" placeholder="Last Name"  <%- (userDefined) ? `value='${lastName}'` : '' %> required maxLength="50" />
-                </div>
-
-                <div class="form-group">
-                    <h5>Phone Number</h5>
-                    <input id="phoneNumber" type="text" class="form-control" name="phoneNumber" maxLength="8" placeholder="Phone Number" <%- (userDefined) ? `value='${phoneNumber}'` : '' %> />
-                </div>
-
-                <div class="form-group">
-                    <h5>Home Number</h5>
-                    <input id="homeNumber" type="text" class="form-control" name="homeNumber" maxLength="8" placeholder="Home Number" <%- (userDefined) ? `value='${homeNumber}'` : '' %> />
-                </div>
-
-                <div class="form-group">
-                    <button class="btn btn-lg btn-primary btn-block">Create User</button>
+                    <button class="btn btn-lg btn-outline-primary btn-block">Create User</button>
                 </div>
             </form>
         </div>
