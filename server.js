@@ -88,7 +88,7 @@ app.post('/params', async (req, res) => {
 
 
 app.get('/users', [checkIsLogged, checkIsAdmin], async (req, res) => {
-    let users = {};
+    let users = [];
     try {
         users = (await db.query('SELECT * FROM getUsers()')).rows;
     } catch (error) {
@@ -165,11 +165,12 @@ app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
 
 
 app.get('/auctions', checkIsLogged, async (req, res) => {
-    let auctions = {},
-        categories = {},
-        subcategories = {};
+    let auctions = [],
+        categories = [],
+        subcategories = [];
     try {
-        auctions = (await db.query('SELECT * FROM getActiveAuctions(NULL, NULL)')).rows;
+        // auctions = (await db.query('SELECT * FROM getActiveAuctions(NULL, NULL)')).rows;
+        auctions = (await db.query('SELECT * FROM Auction ORDER BY endDate ASC')).rows;  // also closed auctions, for temporal testing
         categories = (await db.query('SELECT * FROM getActiveCategories()')).rows;
         subcategories = (await db.query('SELECT * FROM getActiveSubCategories()')).rows;
     } catch (error) {}
@@ -233,16 +234,31 @@ app.post('/auctions/new', async (req, res) => {
 });
 
 
-app.get('/auctions/:id', async (req, res) => {
+app.get('/auctions/:id', checkIsLogged, async (req, res) => {
     try {
-        const auctionId = (isNaN(parseInt(req.params.id)) ? null : parseInt(req.params.id));
-        const auctionInfo = (await db.query('SELECT * FROM getAuctionInfo($1)', [auctionId])).rows[0];
-        console.log(auctionInfo);
-        res.render('auctions/show', {...auctionInfo});
+        const auctionId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
+        const auctionInfo = (await db.query(`SELECT * FROM getAuctionInfo(${auctionId})`)).rows[0];
+        const bids = (await db.query(`SELECT * FROM getAuctionBids(${auctionId})`)).rows;
+        res.render('auctions/show', {...auctionInfo, bids});
     } catch (error) {
         req.flash("error", error.message);
         res.redirect('/auctions');
     }
+});
+
+
+app.post('/auctions/:id', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
+    const auctionId = req.params.id,
+        bidAmount = req.body.bidamount,
+        userId = req.user.id;
+    console.log(`auction:${auctionId} user:${userId}`);
+    try {
+        await db.query(`CALL createBid(${userId}, ${bidAmount}, ${auctionId})`);
+        req.flash("success", 'Successful bid!');
+    } catch (error) {
+        req.flash("error", error.message);
+    }
+    res.redirect(`/auctions/${auctionId}`);
 });
 
 

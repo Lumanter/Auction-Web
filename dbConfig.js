@@ -1,4 +1,6 @@
-const {Pool} = require('pg');
+const pg = require('pg');
+pg.types.setTypeParser(1114, (str) => str);  // don't parse timestamps strings into date js objects
+const {Pool} = pg;
 
 
 const db = new Pool({

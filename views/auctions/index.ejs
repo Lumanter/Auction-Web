@@ -52,11 +52,10 @@
         </div>
     </div>
 
-    <% if (Object.keys(auctions).length !== 0) { %>
-        <ul class="list-group">
-            <a style="visibility: hidden">_</a>  <!-- hide first element -->
+    <% if (auctions !== []) { %>
+        <ul class="list-group mt-3">
             <% auctions.forEach((auction) => { %>
-                <a href="/auctions/<%= auction.id %>" class="list-group-item list-group-item-action"><%= auction.itemname %>  [closes <%= auction.enddate.toISOString().split('T')[0] %>]</a>
+                <a href="/auctions/<%= auction.id %>" class="list-group-item list-group-item-action"><%= auction.itemname %>  [closes <%= auction.enddate.split(' ')[0] %>]</a>
             <% }); %>
         </ul>
     <% } %>

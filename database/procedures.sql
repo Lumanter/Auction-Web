@@ -219,7 +219,7 @@ BEGIN
 	ELSIF ((SELECT userId FROM Auction WHERE id = _auctionId) = _userId) THEN
 		RAISE 'Error: Auction owner can''t bid.';
 	
-	ELSIF ((SELECT endDate FROM Auction WHERE id = _auctionId) >= NOW()) THEN
+	ELSIF ((SELECT endDate FROM Auction WHERE id = _auctionId) <= NOW()) THEN
 		RAISE 'Error: Auction ended.';
 	
 	ELSIF (_amount < getMinBid(_auctionId)) THEN

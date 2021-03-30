@@ -6,7 +6,7 @@
         <a class="btn btn-primary btn-lg" href="/users/new">add</a>
     </header>
 
-    <% if (Object.keys(users).length !== 0) { %>
+    <% if (users !== []) { %>
         <ul class="list-group">
             <% users.forEach((shownUser) => { %>
                 <a href="/users/<%= shownUser.id %>" class="list-group-item list-group-item-action"><%= shownUser.nickname %></a>

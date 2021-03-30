@@ -57,11 +57,18 @@ $$ LANGUAGE SQL;
 
 
 
-CREATE FUNCTION getAuctionBids(_auctionId    INT) 
-RETURNS SETOF Bid AS $$
-	SELECT *
-	FROM Bid
-	WHERE auctionId = _auctionId
+CREATE FUNCTION getAuctionBids(_auctionId INT) 
+RETURNS TABLE (
+	userId    INT,
+	nickname  VARCHAR(20),
+	amount    NUMERIC(14, 2),
+	date      TIMESTAMP
+) AS $$
+	SELECT B.userId, U.nickname, B.amount, B.date
+	FROM Bid B
+	JOIN Users U
+		ON B.userId = U.id
+			AND auctionId = _auctionId
 	ORDER BY date DESC;
 $$ LANGUAGE SQL;
 
