@@ -128,7 +128,6 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
         const shownUser = (await db.query(`SELECT * FROM getUser(${userId})`)).rows[0];
         const buyerHistory = (await db.query(`SELECT * FROM getBuyerHistory(${userId})`)).rows;
         const sellerHistory = (await db.query(`SELECT * FROM getSellerHistory(${userId})`)).rows;
-        console.log(buyerHistory);
         res.render('users/show', {shownUser, buyerHistory, sellerHistory});
     } catch (error) {
         req.flash("error", error.message);

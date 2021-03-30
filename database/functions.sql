@@ -84,12 +84,12 @@ RETURNS TABLE (
 	buyerUserId   INT,
 	buyerNickname VARCHAR(20),
 	amount        NUMERIC(14, 2),
-	winDate       TIMESTAMP,
+	isClosed      BOOL,
 	buyerComment  VARCHAR(120),
 	buyerRating   SMALLINT
 ) AS $$
 	SELECT A.id, itemName, basePrice, startDate, U.id, 
-		   nickname, amount, R.date, comment, rating
+		   nickname, amount, isClosed, comment, rating
 	FROM Auction A
 	LEFT JOIN SellerReview R
 		ON R.auctionId = A.id 
