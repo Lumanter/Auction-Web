@@ -1,6 +1,7 @@
 <%- include('../partials/header'); %>
 
-<div class="container mt-3" style="width: 70%; margin: 25px auto;">
+<div class="container mt-3" style="width: 80%; margin: 25px auto;">
+
     <div class="card">
         <h5 class="card-header"><%= shownUser.nickname %></h5>
         <div class="card-body">
@@ -58,6 +59,51 @@
             <% } %>
         </div>
     </div>
+
+
+    <% if (!shownUser.isadmin) { %>
+        <div class="row mt-2">
+            <div class="col-6">
+                <div class="card">
+                    <h6 class="card-header">Buyer History</h6>
+                    <ul class="list-group list-group-flush">
+                        <% buyerHistory.forEach((bid) => { %>
+                            <li class="list-group-item">
+                                Bid <strong>₡<%= bid.amount %></strong> on <a href="/auctions/<%= bid.auctionid %>"><%= bid.itemname %></a>
+                                <br>
+                                <small>Base price ₡<%= bid.baseprice %></small>
+                                <br>
+                                <small><em><%= bid.biddate.split(' ')[0] %> at <%= bid.biddate.split(' ')[1].slice(0, -7) %></em></small>
+                                <% if (bid.windate) { %>
+                                    <br>
+                                    <h5 class="text-center text-warning">Winner bid!</h5>
+                                <% } %>
+                                <% if (bid.sellercomment || bid.sellerrating) { %>
+                                    Seller: 
+                                    <% if (bid.sellercomment) { %>
+                                        <%= bid.sellercomment %>
+                                    <% } %>
+                                    <% if (bid.sellerrating) { %>
+                                        (<%= bid.sellerrating %>/5)
+                                    <% } %>
+                                <% } %>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-6">
+                <div class="card">
+                    <h6 class="card-header">Seller History</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    <% } %>
 </div>
        
 <%- include('../partials/footer'); %>

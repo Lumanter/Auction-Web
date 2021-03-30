@@ -124,9 +124,12 @@ app.post('/users', async (req, res) => {
 
 app.get('/users/:id', checkIsLogged, async (req, res) => {
     try {
-        const userId = (isNaN(parseInt(req.params.id)) ? null : parseInt(req.params.id));
-        const shownUser = (await db.query('SELECT * FROM getUser($1)', [userId])).rows[0];
-        res.render('users/show', {shownUser: shownUser});
+        const userId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
+        const shownUser = (await db.query(`SELECT * FROM getUser(${userId})`)).rows[0];
+        const buyerHistory = (await db.query(`SELECT * FROM getBuyerHistory(${userId})`)).rows;
+        const sellerHistory = (await db.query(`SELECT * FROM getSellerHistory(${userId})`)).rows;
+        console.log(buyerHistory);
+        res.render('users/show', {shownUser, buyerHistory, sellerHistory});
     } catch (error) {
         req.flash("error", error.message);
         res.redirect('/users');

@@ -111,11 +111,12 @@ RETURNS TABLE (
 	basePrice     NUMERIC(14, 2),
 	amount        NUMERIC(14, 2),
 	bidDate       TIMESTAMP,
+	winDate       TIMESTAMP,
 	sellerComment VARCHAR(120),
 	sellerRating  SMALLINT
 ) AS $$
 	SELECT A.id, itemName, basePrice, amount, 
-		   B.date, comment, rating
+		   B.date, R.date, comment, rating
 	FROM Bid B
 	JOIN Auction A
 		ON B.auctionId = A.id AND
