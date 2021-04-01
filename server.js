@@ -154,7 +154,7 @@ app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
 
     const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6, $7, $8)`;
     const procedureParams = [id, nickname, password, email, firstName, lastName, phoneNumber, homeNumber];
-    
+
     try {
         await db.query(procedureCall, procedureParams);
         req.flash("success", `User ${nickname} updated`);
