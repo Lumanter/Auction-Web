@@ -15,7 +15,7 @@ CREATE TABLE Category (
 CREATE TABLE SubCategory (
 	id         SERIAL PRIMARY KEY,
 	categoryId INT REFERENCES Category NOT NULL,
-	name       VARCHAR(50) NOT NULL
+	name       VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Users (  -- pluralized since a table can't be named User 

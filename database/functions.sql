@@ -209,21 +209,35 @@ $$ LANGUAGE SQL;
 
 
 CREATE FUNCTION getActiveSubCategories() 
-RETURNS SETOF SubCategory AS $$
-	SELECT S.id, S.categoryId, S.name
-	FROM SubCategory S
+RETURNS TABLE (
+	id         INT,
+	categoryId INT,
+	name       VARCHAR(250)
+) AS $$
+	SELECT S.id, S.categoryId, CONCAT(C.name, ' - ', S.name)
+	FROM Subcategory S
+	JOIN Category C
+		ON S.categoryId = C.id
 	JOIN Auction A
 		ON A.subCategoryId = S.id
 			AND A.isClosed = FALSE
-	GROUP BY S.id, S.categoryId, S.name
-	ORDER BY S.name;
+	GROUP BY S.id, S.categoryId, S.name, C.name
+	ORDER BY C.name, S.name
 $$ LANGUAGE SQL;
 
 
 
 CREATE FUNCTION getSubCategories() 
-RETURNS SETOF SubCategory AS $$
-	SELECT * FROM SubCategory ORDER By name
+RETURNS TABLE (
+	id         INT,
+	categoryId INT,
+	name       VARCHAR(250)
+) AS $$
+	SELECT S.id, S.categoryId, CONCAT(C.name, ' - ', S.name)
+	FROM Subcategory S
+	JOIN Category C
+		ON S.categoryId = C.id
+	ORDER BY C.name, S.name
 $$ LANGUAGE SQL;
 
 
@@ -233,7 +247,7 @@ CREATE FUNCTION getAuctionInfo(_id INT)
 RETURNS TABLE (
 	auctionId       INT,
 	itemName        VARCHAR(60),
-	subcategoryName VARCHAR(50),
+	subcategoryName VARCHAR(100),
 	sellerId        INT,
 	sellerNickname  VARCHAR(50),
 	basePrice       NUMERIC(14, 2),
