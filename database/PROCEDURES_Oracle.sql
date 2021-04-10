@@ -1,6 +1,7 @@
 execute createUser(201280645,'F','Pepe','12345678','example1@gmail.com','Pepe', 'Aguilar', NULL, NULL);
 drop procedure createUser
 select * from users
+
 CREATE or replace PROCEDURE PRUEBA
 AS 
 BEGIN
@@ -58,6 +59,7 @@ BEGIN
 		END;
 	END IF;
 END;
+select * from users where password = cryptf('12345678')
 
 
 --Proccedure 2
@@ -442,4 +444,6 @@ SELECT * FROM SellerReview; SELECT * FROM BuyerReview;
 UPDATE Auction SET isClosed = FALSE WHERE id = 5;
 DELETE FROM SellerReview WHERE auctionId = 5;
 DELETE FROM BuyerReview WHERE auctionId = 5;
+
+
 
