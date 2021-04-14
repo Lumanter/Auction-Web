@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <% if (!isclosed && user.id != sellerid) { %>
+    <% if (!isclosed && user.id != sellerid && !user.isadmin) { %>
         <div class="row justify-content-center mt-2">
             <form class="form-inline" action="/auctions/<%= auctionid %>/bid" method="POST">
                 <div class="input-group">
