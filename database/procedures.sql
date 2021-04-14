@@ -5,15 +5,13 @@ CREATE PROCEDURE createUser(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50),
-	_phoneNumber VARCHAR(8),
-	_homeNumber  VARCHAR(8))
+	_lastName    VARCHAR(50))
 LANGUAGE PLPGSQL AS $$
 BEGIN
     IF ((_id IS NULL) OR (_isAdmin IS NULL) OR (COALESCE(TRIM(_nickname),'') = '') OR 
 		(COALESCE(TRIM(_password),'') = '') OR (COALESCE(TRIM(_email),'') = '')  OR 
 		(COALESCE(TRIM(_firstName),'') = '') OR (COALESCE(TRIM(_lastName),'') = '')) THEN
-		RAISE 'Error: Null parameter, only phone numbers are optional.';
+		RAISE 'Error: Null parameter.';
 		
 	ELSIF EXISTS(SELECT * FROM Users WHERE id = _id) THEN
 		RAISE 'Error: User already exists.';
@@ -30,7 +28,7 @@ BEGIN
 	ELSE
 		BEGIN
 			INSERT INTO Users VALUES
-			(_id, _isAdmin, _nickname, crypt(_password, gen_salt('bf')), _email, _firstName, _lastName, _phoneNumber, _homeNumber);
+			(_id, _isAdmin, _nickname, crypt(_password, gen_salt('bf')), _email, _firstName, _lastName);
 			COMMIT;
 		END;
 	END IF;
@@ -45,15 +43,13 @@ CREATE PROCEDURE updateUser(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50),
-	_phoneNumber VARCHAR(8),
-	_homeNumber  VARCHAR(8))
+	_lastName    VARCHAR(50))
 LANGUAGE PLPGSQL AS $$
 BEGIN
     IF ((_id IS NULL) OR (COALESCE(TRIM(_nickname),'') = '') OR 
 		(COALESCE(TRIM(_password),'') = '') OR (COALESCE(TRIM(_email),'') = '')  OR 
 		(COALESCE(TRIM(_firstName),'') = '') OR (COALESCE(TRIM(_lastName),'') = '')) THEN
-		RAISE 'Error: Null parameter, only phone numbers are optional.';
+		RAISE 'Error: Null parameter.';
 		
 	ELSIF NOT EXISTS(SELECT * FROM Users WHERE id = _id) THEN
 		RAISE 'Error: User not exists.';
@@ -74,9 +70,7 @@ BEGIN
 				password = crypt(_password, gen_salt('bf')),
 				email = _email,
 				firstName = _firstName,
-				lastName = _lastName,
-				phoneNumber = _phoneNumber,
-				homeNumber = _homeNumber
+				lastName = _lastName
 			WHERE id = _id;
 			COMMIT;
 		END;
@@ -92,12 +86,10 @@ CREATE PROCEDURE createAdmin(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50),
-	_phoneNumber VARCHAR(8),
-	_homeNumber  VARCHAR(8))
+	_lastName    VARCHAR(50))
 LANGUAGE PLPGSQL AS $$
 BEGIN
-	CALL createUser(_id, TRUE, _nickname, _password, _email, _firstName, _lastName, _phoneNumber, _homeNumber);
+	CALL createUser(_id, TRUE, _nickname, _password, _email, _firstName, _lastName);
 END;$$
 
 
@@ -109,12 +101,10 @@ CREATE PROCEDURE updateAdmin(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50),
-	_phoneNumber VARCHAR(8),
-	_homeNumber  VARCHAR(8))
+	_lastName    VARCHAR(50))
 LANGUAGE PLPGSQL AS $$
 BEGIN
-	CALL updateUser(_id, TRUE, _nickname, _password, _email, _firstName, _lastName, _phoneNumber, _homeNumber);
+	CALL updateUser(_id, TRUE, _nickname, _password, _email, _firstName, _lastName);
 END;$$
 
 
@@ -126,12 +116,10 @@ CREATE PROCEDURE createParticipant(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50),
-	_phoneNumber VARCHAR(8),
-	_homeNumber  VARCHAR(8))
+	_lastName    VARCHAR(50))
 LANGUAGE PLPGSQL AS $$
 BEGIN
-	CALL createUser(_id, FALSE, _nickname, _password, _email, _firstName, _lastName, _phoneNumber, _homeNumber);
+	CALL createUser(_id, FALSE, _nickname, _password, _email, _firstName, _lastName);
 END;$$
 
 
@@ -143,12 +131,10 @@ CREATE PROCEDURE updateParticipant(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50),
-	_phoneNumber VARCHAR(8),
-	_homeNumber  VARCHAR(8))
+	_lastName    VARCHAR(50))
 LANGUAGE PLPGSQL AS $$
 BEGIN
-	CALL updateUser(_id, FALSE, _nickname, _password, _email, _firstName, _lastName, _phoneNumber, _homeNumber);
+	CALL updateUser(_id, FALSE, _nickname, _password, _email, _firstName, _lastName);
 END;$$
 
 
@@ -361,4 +347,27 @@ BEGIN
 			END;
 		END IF;
 	END LOOP;
+END;$$
+
+CREATE PROCEDURE createUserPhone(
+	_userId    INT,
+	_phone    VARCHAR(8))
+LANGUAGE PLPGSQL AS $$
+BEGIN
+	IF ((_userId IS NULL) OR (COALESCE(TRIM(_phone),'') = '')) THEN
+		RAISE 'Error: Null parameter.';
+	
+	ELSIF NOT EXISTS(SELECT * FROM Users WHERE id = _userId) THEN
+		RAISE 'Error: User not exists.';
+	
+	ELSIF EXISTS(SELECT * FROM UserPhone WHERE userId = _userId) THEN
+		RAISE 'Error: Phone already registered.';
+	
+	ELSE 
+		BEGIN
+			INSERT INTO UserPhone VALUES
+			(_userId, _phone);
+			COMMIT;
+		END;
+	END IF;
 END;$$

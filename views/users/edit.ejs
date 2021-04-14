@@ -50,22 +50,21 @@
             <input id="lastName" type="text" class="form-control" name="lastName"  value='<%- lastname %>' required maxLength="50" />
         </div>
 
-        <div class="input-group mb-2">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Phone Number</span>
-            </div>
-            <input id="phoneNumber" type="text" class="form-control" name="phoneNumber" maxLength="8" value='<%- phonenumber %>' />
+        <div class="form-group">
+            <button class="btn btn-lg btn-outline-primary btn-block">Update User</button>
         </div>
+    </form>
 
-        <div class="input-group mb-2">
+    <form action='/users/<%- id %>/phone' method="POST">
+        <div class="input-group mb-2 mt-5">
             <div class="input-group-prepend">
-                <span class="input-group-text">Home Number</span>
+                <span class="input-group-text">Phone</span>
             </div>
-            <input id="homeNumber" type="text" class="form-control" name="homeNumber" maxLength="8" value='<%- homenumber %>' />
+            <input id="phone" type="text" class="form-control" name="phone" maxLength="8" />
         </div>
 
         <div class="form-group">
-            <button class="btn btn-lg btn-outline-primary btn-block">Update User</button>
+            <button class="btn btn-lg btn-outline-primary btn-block">Add Phone</button>
         </div>
     </form>
 </div>

@@ -53,20 +53,6 @@
                     <input id="lastName" type="text" class="form-control" name="lastName"  <%- (userDefined) ? `value='${lastName}'` : '' %> required maxLength="50" />
                 </div>
 
-                <div class="input-group mb-2">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Phone Number</span>
-                    </div>
-                    <input id="phoneNumber" type="text" class="form-control" name="phoneNumber" maxLength="8" <%- (userDefined) ? `value='${phoneNumber}'` : '' %> />
-                </div>
-
-                <div class="input-group mb-2">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Home Number</span>
-                    </div>
-                    <input id="homeNumber" type="text" class="form-control" name="homeNumber" maxLength="8" <%- (userDefined) ? `value='${homeNumber}'` : '' %> />
-                </div>
-
                 <div class="form-group">
                     <button class="btn btn-lg btn-outline-primary btn-block">Create User</button>
                 </div>

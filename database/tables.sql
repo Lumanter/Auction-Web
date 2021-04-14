@@ -26,8 +26,13 @@ CREATE TABLE Users (  -- pluralized since a table can't be named User
 	email       VARCHAR(320) NOT NULL,
 	firstName   VARCHAR(50) NOT NULL,
 	lastName    VARCHAR(50) NOT NULL,
-	phoneNumber VARCHAR(8),
-	homeNumber  VARCHAR(8)
+	address     VARCHAR(120)
+);
+
+CREATE TABLE UserPhone ( 
+	userId INT NOT NULL REFERENCES Users,
+	phone  VARCHAR(8) NOT NULL,
+	PRIMARY KEY(userId, phone)
 );
 
 CREATE TABLE Bid (

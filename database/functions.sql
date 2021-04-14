@@ -281,3 +281,14 @@ BEGIN
 	END IF;
 END;
 $$ LANGUAGE PLPGSQL;
+
+
+
+
+CREATE FUNCTION getUserPhones(_userId INT)
+RETURNS TEXT AS $$
+	SELECT string_agg(phone, ', ')  -- concatenate phones with ', ' as separator
+	FROM UserPhone	
+	WHERE userId = _userId
+	GROUP BY userId
+$$ LANGUAGE SQL;

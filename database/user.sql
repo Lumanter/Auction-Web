@@ -9,5 +9,6 @@ GRANT SELECT, INSERT, UPDATE ON
 	SellerReview, 
 	Category, 
 	SubCategory, 
-	Users 
+	Users,
+	UserPhone
 	TO auctionwebapp; -- grant crud (minus delete) on all tables

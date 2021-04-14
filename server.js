@@ -104,12 +104,12 @@ app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
 
 
 app.post('/users', async (req, res) => {
-    const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;  // take form data
+    const {nickname, email, password, firstName, lastName} = req.body;  // take form data
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
     const isAdmin = (req.body.isAdmin !== undefined);
 
-    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
-    const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName, phoneNumber, homeNumber];
+    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7)`;
+    const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName];
     
     try {
         await db.query(procedureCall, procedureParams);
@@ -117,7 +117,7 @@ app.post('/users', async (req, res) => {
         res.redirect(`/users/${id}`);
     } catch (error) {
         req.flash("error", error.message);
-        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, phoneNumber, homeNumber});  // pass data to restore user form
+        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName});  // pass data to restore user form
     }
 });
 
@@ -126,9 +126,10 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
     try {
         const userId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
         const shownUser = (await db.query(`SELECT * FROM getUser(${userId})`)).rows[0];
+        const phones = (await db.query(`SELECT getUserPhones(${userId})`)).rows[0].getuserphones;
         const buyerHistory = (await db.query(`SELECT * FROM getBuyerHistory(${userId})`)).rows;
         const sellerHistory = (await db.query(`SELECT * FROM getSellerHistory(${userId})`)).rows;
-        res.render('users/show', {shownUser, buyerHistory, sellerHistory});
+        res.render('users/show', {shownUser, phones, buyerHistory, sellerHistory});
     } catch (error) {
         req.flash("error", error.message);
         res.redirect('/users');
@@ -148,12 +149,27 @@ app.get('/users/:id/edit', [checkIsLogged, checkIsAdmin], async (req, res) => {
 });
 
 
-app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
-    const {nickname, email, password, firstName, lastName, phoneNumber, homeNumber} = req.body;
+app.post('/users/:id/phone', [checkIsLogged, checkIsAdmin], async (req, res) => {
+    const {phone} = req.body;
     const id = req.params.id;
 
-    const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6, $7, $8)`;
-    const procedureParams = [id, nickname, password, email, firstName, lastName, phoneNumber, homeNumber];
+    try {
+        await db.query(`CALL createUserPhone(${id}, '${phone}')`);
+        req.flash("success", `Phone added`);
+        res.redirect(`/users/${id}`);
+    } catch (error) {
+        req.flash("error", error.message);
+        res.redirect(`/users/${id}/edit`)
+    }   
+});
+
+
+app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
+    const {nickname, email, password, firstName, lastName} = req.body;
+    const id = req.params.id;
+
+    const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6)`;
+    const procedureParams = [id, nickname, password, email, firstName, lastName];
 
     try {
         await db.query(procedureCall, procedureParams);
