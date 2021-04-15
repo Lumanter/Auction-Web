@@ -12,3 +12,4 @@ GRANT SELECT, INSERT, UPDATE ON
 	Users,
 	UserPhone
 	TO auctionwebapp; -- grant crud (minus delete) on all tables
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO auctionwebapp;  -- sequences are used in auto incremental id's like auction
