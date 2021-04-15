@@ -30,10 +30,10 @@ INSERT INTO SubCategory (categoryId, name) VALUES
 (34, 'Consolas de videojuego'), (34, 'Videojuegos'), (35, 'Otros'), (35, 'Solo para adultos');
 
 INSERT INTO Users VALUES
-(201480645, TRUE, 'the_admin', crypt('12345678', gen_salt('bf')), 'admin@gmail.com', 'Admin', 'The First', NULL, NULL),
-(201620611, FALSE, 'the_buyer', crypt('12345678', gen_salt('bf')), 'buyer@gmail.com', 'Buyer', 'The First', '89887432', '24538546'),
-(202720532, FALSE, 'the_seller', crypt('12345678', gen_salt('bf')), 'selller@gmail.com', 'Seller', 'The First', '87847211', '24576310'),
-(201620622, FALSE, 'the_buyer2', crypt('12345678', gen_salt('bf')), 'buyer2@gmail.com', 'Buyer', 'The Second', '85867211', '24437733');
+(201480645, TRUE, 'the_admin', crypt('12345678', gen_salt('bf')), 'admin@gmail.com', 'Admin', 'The First'),
+(201620611, FALSE, 'the_buyer', crypt('12345678', gen_salt('bf')), 'buyer@gmail.com', 'Buyer', 'The First'),
+(202720532, FALSE, 'the_seller', crypt('12345678', gen_salt('bf')), 'selller@gmail.com', 'Seller', 'The First'),
+(201620622, FALSE, 'the_buyer2', crypt('12345678', gen_salt('bf')), 'buyer2@gmail.com', 'Buyer', 'The Second');
 
 INSERT INTO Auction (itemName, subCategoryId, userId, bestBidId, basePrice, startDate, endDate, itemDescription, deliveryDetails, itemPhoto, isClosed, itemWasSold) VALUES
 ('Nintendo Wii', 67, 202720532, NULL, 30000, '2020-01-22 00:00:00-06', '2020-05-22 00:00:00-06', 'Bought in 2008, excellent state', 'To deliver in San José', NULL, TRUE, TRUE),
