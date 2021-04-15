@@ -513,6 +513,7 @@ AS
                 
                 
 BEGIN
+    select password into encryptedPassword from users where nickname = pNickname and cryptf(pPassword) = password;
     SELECT COUNT(*) INTO countUser FROM Users WHERE nickname = pNickname;
     IF countUser > 0 then            
         IF cryptf(pPassword) = encryptedPassword THEN
