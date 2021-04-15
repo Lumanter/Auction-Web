@@ -56,8 +56,7 @@ CREATE or replace PROCEDURE updateUser(
 	pEmail       VARCHAR,
 	pFirstName   VARCHAR,
 	pLastName    VARCHAR,
-	pPhoneNumber VARCHAR,
-	pHomeNumber  VARCHAR
+	paddress     VARCHAR
 )
 IS
 countUser INTEGER;
@@ -66,15 +65,16 @@ countEmail integer;
 auxIsadmin char(1);
 BEGIN
    
-    SELECT isAdmin into auxIsadmin FROM Users WHERE id = pId;
     SELECT count(*) into countUser FROM Users WHERE id = pId;
     SELECT count(*) into countNick FROM  Users  WHERE nickname = pNickname AND id != pId;
     SELECT count(*) into countEmail FROM Users WHERE email = pEmail AND id != pId;
-
+    if countUser  > 0 THEN
+        SELECT isAdmin into auxIsadmin FROM Users WHERE id = pId;
+    end if;
     IF (pId IS NULL OR pIsAdmin IS NULL OR pNickname is null OR 
 		pPassword is null OR pEmail is null  OR 
-		pFirstName is null OR pLastName is null) THEN
-		RAISE_APPLICATION_ERROR(-20005,'Error: Null parameter, only phone numbers are optional.');
+		pFirstName is null OR pLastName is null or paddress is null) THEN
+		RAISE_APPLICATION_ERROR(-20005,'Error: Null parameter');
         
 	ELSIF countUser < 1 THEN
 		RAISE_APPLICATION_ERROR(-20006,'Error: User not exists.');
@@ -99,15 +99,12 @@ BEGIN
 				email = pEmail,
 				firstName = pFirstName,
 				lastName = pLastName,
-				phoneNumber = pPhoneNumber,
-				homeNumber = pHomeNumber
+				address = paddress
 			WHERE id = pId;
 			COMMIT;
 		END;
 	END IF;
 END;
-
-
 --Proccedure 3
 
 
@@ -420,14 +417,32 @@ end;		IF auctionRow.isClosed = FALSE AND
 	END LOOP;
 END;
 
-SELECT updateClosedAuctions();
-
-SELECT id, itemName, endDate, isClosed FROM Auction WHERE id = 5;
-SELECT * FROM SellerReview; SELECT * FROM BuyerReview;
-
-UPDATE Auction SET isClosed = FALSE WHERE id = 5;
-DELETE FROM SellerReview WHERE auctionId = 5;
-DELETE FROM BuyerReview WHERE auctionId = 5;
+CREATE or replace PROCEDURE createUserPhone(
+	pUserId    INT,
+	pPhone    VARCHAR)
+iS 
+countuser int;
+counPhone int;
+BEGIN
+    select count(*) into  countuser FROM Users WHERE id = pUserId;
+    select count(*) into counPhone FROM UserPhone WHERE userId = pUserId and phone = pPhone; 
+	IF (pUserId IS NULL OR pPhone is null) THEN
+		RAISE_APPLICATION_ERROR(-20029,'Error: Null parameter.');
+	
+	ELSIF countuser < 1  THEN
+		RAISE_APPLICATION_ERROR(-20029,'Error: User not exists.');
+	
+	ELSIF counPhone > 0  THEN
+		RAISE_APPLICATION_ERROR(-20029,'Error: Phone already registered.');
+	
+	ELSE 
+		BEGIN
+			INSERT INTO UserPhone VALUES
+			(puserId, pphone);
+			COMMIT;
+		END;
+	END IF;
+END;
 
 
 
