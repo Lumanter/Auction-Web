@@ -1,3 +1,34 @@
+--////////////////////////////crypt funtions
+create or replace function cryptf( p_str in varchar2 ) return varchar2
+  as
+      l_data  varchar2(255);
+  begin
+     l_data := rpad( p_str, (trunc(length(p_str)/8)+1)*8, chr(0) );
+  
+      dbms_obfuscation_toolkit.DESEncrypt
+          ( input_string => l_data,
+            key_string   => 'DBAKey03',
+           encrypted_string=> l_data );
+ 
+      return l_data;
+  end;
+
+
+create or replace
+  function decryptf( p_str in varchar2 ) return varchar2
+  as
+      l_data  varchar2(255);
+  begin
+      dbms_obfuscation_toolkit.DESDecrypt
+          ( input_string => p_str,
+            key_string   => 'DBAKey03',
+            decrypted_string=> l_data );
+  
+      return rtrim( l_data, chr(0) );
+  end;
+
+
+--//////////////////////////////////////////getMinBid
 CREATE OR REPLACE FUNCTION getMinBid(pAuctionId NUMERIC) 
 RETURN numeric
 Is 
