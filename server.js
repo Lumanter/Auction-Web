@@ -90,7 +90,8 @@ app.post('/params', async (req, res) => {
 app.get('/users', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let users = [];
     try {
-        users = (await query('SELECT * FROM getUsers()')).rows;
+        users = await query('SELECT * FROM getUsers()');
+        users = users.map((user) => parseUser(user));
     } catch (error) {
         res.send('An error ocurred retrieving the users');
     }
@@ -125,7 +126,7 @@ app.post('/users', async (req, res) => {
 app.get('/users/:id', checkIsLogged, async (req, res) => {
     try {
         const userId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
-        const shownUser = parseUser((await query(`SELECT * FROM Users WHERE id = ${userId}`))[0]);
+        const shownUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
         // const phones = (await query(`SELECT getUserPhones(${userId})`)).rows[0].getuserphones;
         const phones = '';
         // const buyerHistory = (await query(`SELECT * FROM getBuyerHistory(${userId})`)).rows;
@@ -143,7 +144,7 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
 app.get('/users/:id/edit', [checkIsLogged, checkIsAdmin], async (req, res) => {
     try {
         const userId = req.params.id;
-        const editUser = (await query('SELECT * FROM getUser($1)', [userId])).rows[0];
+        const editUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
         res.render('users/edit', {...editUser});
     } catch (error) {
         req.flash("error", error.message);
