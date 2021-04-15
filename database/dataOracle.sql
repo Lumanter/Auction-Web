@@ -2,56 +2,56 @@ INSERT INTO AuctionParameter (improvementPercent, minIncrement, dateT) VALUES
 (3, 3000,CURRENT_TIMESTAMP);
 select * from auctionparameter
 INSERT ALL
-    Into Category (name) values('Antigüedades')
+    Into Category (name) values('AntigÃ¼edades')
     Into Category (name) values('Arte')
-    Into Category (name) values('Bebés') 
+    Into Category (name) values('BebÃ©s') 
     Into Category (name) values('Libros')
     Into Category (name) values('Equipo y maquinaria industrial')
-    Into Category (name) values('Cámaras y fotografía') 
-    Into Category (name) values('Teléfonos celulares y accesorios') 
+    Into Category (name) values('CÃ¡maras y fotografÃ­a') 
+    Into Category (name) values('TelÃ©fonos celulares y accesorios') 
     Into Category (name) values('Ropa, zapatos y accesorios') 
     Into Category (name) values('Monedas y billetes') 
-    Into Category (name) values('Artículos de colección')
+    Into Category (name) values('ArtÃ­culos de colecciÃ³n')
     Into Category (name) values('Computadoras, tablets y redes') 
-    Into Category (name) values('Artículos electrónicos') 
-    Into Category (name) values('Artesanías') 
-    Into Category (name) values('Muñecas y osos') 
-    Into Category (name) values('Películas y DVD')
-    Into Category (name) values('Vehículos') 
+    Into Category (name) values('ArtÃ­culos electrÃ³nicos') 
+    Into Category (name) values('ArtesanÃ­as') 
+    Into Category (name) values('MuÃ±ecas y osos') 
+    Into Category (name) values('PelÃ­culas y DVD')
+    Into Category (name) values('VehÃ­culos') 
     Into Category (name) values('Memorabilia de entretenimiento') 
     Into Category (name) values('Tarjetas de regalo y cupones') 
     Into Category (name) values('Belleza y salud') 
-    Into Category (name) values('Casa y jardín') 
-    Into Category (name) values('Joyería y relojes') 
-    Into Category (name) values('Música') 
+    Into Category (name) values('Casa y jardÃ­n') 
+    Into Category (name) values('JoyerÃ­a y relojes') 
+    Into Category (name) values('MÃºsica') 
     Into Category (name) values('Instrumentos y equipos musicales') 
     Into Category (name) values('Productos para mascotas') 
-    Into Category (name) values('Cerámica y vidrio') 
-    Into Category (name) values('Bienes raíces') 
+    Into Category (name) values('CerÃ¡mica y vidrio') 
+    Into Category (name) values('Bienes raÃ­ces') 
     Into Category (name) values('Servicios especiales') 
-    Into Category (name) values('Artículos deportivos') 
+    Into Category (name) values('ArtÃ­culos deportivos') 
     Into Category (name) values('Memorabilia de deporte, tarjetas, fans') 
     Into Category (name) values('Estampillas') 
     Into Category (name) values('Boletos y experiencias')
     Into Category (name) values('Juguetes y pasatiempos') 
     Into Category (name) values('Viaje') 
     Into Category (name) values('Videojuegos y consolas') 
-    Into Category (name) values('Todo lo demás')
+    Into Category (name) values('Todo lo demÃ¡s')
 SELECT * FROM dual
 
 
 INSERT ALL 
-    INTO SubCategory (categoryId, name) VALUES(1, 'Antigüedades')
-    INTO SubCategory (categoryId, name) VALUES(1, 'Arquitectónico y jardín') 
+    INTO SubCategory (categoryId, name) VALUES(1, 'AntigÃ¼edades')
+    INTO SubCategory (categoryId, name) VALUES(1, 'ArquitectÃ³nico y jardÃ­n') 
     INTO SubCategory (categoryId, name) VALUES(2, 'Directo del artista')
     INTO SubCategory (categoryId, name) VALUES(2, 'Lotes al por mayor') 
     INTO SubCategory (categoryId, name) VALUES(3, 'Asientos de seguridad para autos') 
-    INTO SubCategory (categoryId, name) VALUES(3, 'Artículos para bebé') 
-    INTO SubCategory (categoryId, name) VALUES(4, 'Libros de textos, educación') 
-    INTO SubCategory (categoryId, name) VALUES(4, 'Ficción y literatura') 
-    INTO SubCategory (categoryId, name) VALUES(5, 'Construcción')
+    INTO SubCategory (categoryId, name) VALUES(3, 'ArtÃ­culos para bebÃ©') 
+    INTO SubCategory (categoryId, name) VALUES(4, 'Libros de textos, educaciÃ³n') 
+    INTO SubCategory (categoryId, name) VALUES(4, 'FicciÃ³n y literatura') 
+    INTO SubCategory (categoryId, name) VALUES(5, 'ConstrucciÃ³n')
     INTO SubCategory (categoryId, name) VALUES(5, 'Agricultura y silvicultura') 
-    INTO SubCategory (categoryId, name) VALUES(6, 'Drones con cámaras')
+    INTO SubCategory (categoryId, name) VALUES(6, 'Drones con cÃ¡maras')
     INTO SubCategory (categoryId, name) VALUES(6, 'Binoculares y telescopios')
     INTO SubCategory (categoryId, name) VALUES(7, 'Relojes inteligentes') 
     INTO SubCategory (categoryId, name) VALUES(7, 'Celulares y smartphones')
@@ -59,28 +59,28 @@ INSERT ALL
     INTO SubCategory (categoryId, name) VALUES(8, 'Ropa para mujer')
     INTO SubCategory (categoryId, name) VALUES(9, 'En lingotes') 
     INTO SubCategory (categoryId, name) VALUES(9, 'Monedas: EE. UU.') 
-    INTO SubCategory (categoryId, name) VALUES(10, 'Cómics') 
+    INTO SubCategory (categoryId, name) VALUES(10, 'CÃ³mics') 
     INTO SubCategory (categoryId, name) VALUES(10, 'Relojes')
     INTO SubCategory (categoryId, name) VALUES(11, 'Laptops y netbooks')
-    INTO SubCategory (categoryId, name) VALUES(11, 'iPads, tablets y lectores electrónicos') 
-    INTO SubCategory (categoryId, name) VALUES(12, 'Audio portátil y audífonos') 
+    INTO SubCategory (categoryId, name) VALUES(11, 'iPads, tablets y lectores electrÃ³nicos') 
+    INTO SubCategory (categoryId, name) VALUES(12, 'Audio portÃ¡til y audÃ­fonos') 
     INTO SubCategory (categoryId, name) VALUES(12, 'Televisor, video y audio para el hogar') 
     INTO SubCategory (categoryId, name) VALUES(13, 'Materiales para arte')
-    INTO SubCategory (categoryId, name) VALUES(13, 'Artes y artesanías para el hogar') 
-    INTO SubCategory (categoryId, name) VALUES(14, 'Muñecas')
+    INTO SubCategory (categoryId, name) VALUES(13, 'Artes y artesanÃ­as para el hogar') 
+    INTO SubCategory (categoryId, name) VALUES(14, 'MuÃ±ecas')
     INTO SubCategory (categoryId, name) VALUES(14, 'Osos')
     INTO SubCategory (categoryId, name) VALUES(15, 'Cintas VHS') 
     INTO SubCategory (categoryId, name) VALUES(15, 'DVD y Blu-ray') 
     INTO SubCategory (categoryId, name) VALUES(16, 'Motocicletas') 
-    INTO SubCategory (categoryId, name) VALUES(16, 'Vehículos y camionetas') 
-    INTO SubCategory (categoryId, name) VALUES(17, 'Memorabilia de películas') 
-    INTO SubCategory (categoryId, name) VALUES(17, 'Autógrafos-original') 
+    INTO SubCategory (categoryId, name) VALUES(16, 'VehÃ­culos y camionetas') 
+    INTO SubCategory (categoryId, name) VALUES(17, 'Memorabilia de pelÃ­culas') 
+    INTO SubCategory (categoryId, name) VALUES(17, 'AutÃ³grafos-original') 
     INTO SubCategory (categoryId, name) VALUES(18, 'Tarjetas de regalo de eBay') 
     INTO SubCategory (categoryId, name) VALUES(18, 'Tarjetas de regalo') 
-    INTO SubCategory (categoryId, name) VALUES(19, 'Suplementos alimenticios, nutrición') 
-    INTO SubCategory (categoryId, name) VALUES(19, 'Cuerpo y baño') 
+    INTO SubCategory (categoryId, name) VALUES(19, 'Suplementos alimenticios, nutriciÃ³n') 
+    INTO SubCategory (categoryId, name) VALUES(19, 'Cuerpo y baÃ±o') 
     INTO SubCategory (categoryId, name) VALUES(20, 'Ropa de cama') 
-    INTO SubCategory (categoryId, name) VALUES(20, 'Baño') 
+    INTO SubCategory (categoryId, name) VALUES(20, 'BaÃ±o') 
     INTO SubCategory (categoryId, name) VALUES(21, 'Diamantes y gemas sueltos') 
     INTO SubCategory (categoryId, name) VALUES(21, 'Joyas de moda') 
     INTO SubCategory (categoryId, name) VALUES(22, 'CD') 
@@ -89,24 +89,24 @@ INSERT ALL
     INTO SubCategory (categoryId, name) VALUES(23, 'Guitarra')
     INTO SubCategory (categoryId, name) VALUES(24, 'Gatos')
     INTO SubCategory (categoryId, name) VALUES(24, 'Aves')
-    INTO SubCategory (categoryId, name) VALUES(25, 'Cerámica y porcelana')
+    INTO SubCategory (categoryId, name) VALUES(25, 'CerÃ¡mica y porcelana')
     INTO SubCategory (categoryId, name) VALUES(25, 'Vidrio')
     INTO SubCategory (categoryId, name) VALUES(26, 'Terreno')
     INTO SubCategory (categoryId, name) VALUES(26, 'Comerciales')
     INTO SubCategory (categoryId, name) VALUES(27, 'Servicios de subastas de eBay')
-    INTO SubCategory (categoryId, name) VALUES(27, 'Servicios artísticos')
+    INTO SubCategory (categoryId, name) VALUES(27, 'Servicios artÃ­sticos')
     INTO SubCategory (categoryId, name) VALUES(28, 'Pesca')
     INTO SubCategory (categoryId, name) VALUES(28, 'Ciclismo')
     INTO SubCategory (categoryId, name) VALUES(29, 'Tarjetas')
-    INTO SubCategory (categoryId, name) VALUES(29, 'Autógrafos (original)')
-    INTO SubCategory (categoryId, name) VALUES(30, 'Canadá')
+    INTO SubCategory (categoryId, name) VALUES(29, 'AutÃ³grafos (original)')
+    INTO SubCategory (categoryId, name) VALUES(30, 'CanadÃ¡')
     INTO SubCategory (categoryId, name) VALUES(30, 'Estados Unidos')
     INTO SubCategory (categoryId, name) VALUES(31, 'Boletos para conciertos')
     INTO SubCategory (categoryId, name) VALUES(31, 'Boletos para deportes')
-    INTO SubCategory (categoryId, name) VALUES(32, 'Juguetes clásicos')
-    INTO SubCategory (categoryId, name) VALUES(32, 'Figuras de acción')
-    INTO SubCategory (categoryId, name) VALUES(33, 'Alquiler de automóviles')
-    INTO SubCategory (categoryId, name) VALUES(33, 'Línea aérea')
+    INTO SubCategory (categoryId, name) VALUES(32, 'Juguetes clÃ¡sicos')
+    INTO SubCategory (categoryId, name) VALUES(32, 'Figuras de acciÃ³n')
+    INTO SubCategory (categoryId, name) VALUES(33, 'Alquiler de automÃ³viles')
+    INTO SubCategory (categoryId, name) VALUES(33, 'LÃ­nea aÃ©rea')
     INTO SubCategory (categoryId, name) VALUES(34, 'Consolas de videojuego')
     INTO SubCategory (categoryId, name) VALUES(34, 'Videojuegos')
     INTO SubCategory (categoryId, name) VALUES(35, 'Otros')
@@ -122,36 +122,6 @@ INSERT all
 SELECT * FROM dual
 
 
--------/////////////////
------//////////// Encryption and decryption functions
------///////////////
-create or replace function cryptf( p_str in varchar2 ) return varchar2
-  as
-      l_data  varchar2(255);
-  begin
-     l_data := rpad( p_str, (trunc(length(p_str)/8)+1)*8, chr(0) );
-  
-      dbms_obfuscation_toolkit.DESEncrypt
-          ( input_string => l_data,
-            key_string   => 'DBAKey03',
-           encrypted_string=> l_data );
- 
-      return l_data;
-  end;
-
-
-create or replace
-  function decryptf( p_str in varchar2 ) return varchar2
-  as
-      l_data  varchar2(255);
-  begin
-      dbms_obfuscation_toolkit.DESDecrypt
-          ( input_string => p_str,
-            key_string   => 'DBAKey03',
-            decrypted_string=> l_data );
-  
-      return rtrim( l_data, chr(0) );
-  end;
 
 -------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
@@ -160,9 +130,9 @@ create or replace
 
 INSERT all
     INTO Auction (itemName, subCategoryId, userId, bestBidId, basePrice, startDate, endDate, itemDescription, deliveryDetails, itemPhoto, isClosed, itemWasSold) VALUES
-    ('Nintendo Wii', 67, 202720532, NULL, 30000, '22-01-2020 00:00:00,06', '22-05-2020 00:00:00,06', 'Bought in 2008, excellent state', 'To deliver in San José', NULL, 'T', 'T')
+    ('Nintendo Wii', 67, 202720532, NULL, 30000, '22-01-2020 00:00:00,06', '22-05-2020 00:00:00,06', 'Bought in 2008, excellent state', 'To deliver in San JosÃ©', NULL, 'T', 'T')
     INTO Auction (itemName, subCategoryId, userId, bestBidId, basePrice, startDate, endDate, itemDescription, deliveryDetails, itemPhoto, isClosed, itemWasSold) VALUES
-    ('Lady Datejust Rolex', 10, 202720532, NULL, 350000, CURRENT_TIMESTAMP, '22-05-2021 00:00:00,06', 'Limited edition deluxe watch', 'To deliver in San José', NULL, 'F', NULL)
+    ('Lady Datejust Rolex', 10, 202720532, NULL, 350000, CURRENT_TIMESTAMP, '22-05-2021 00:00:00,06', 'Limited edition deluxe watch', 'To deliver in San JosÃ©', NULL, 'F', NULL)
 SELECT * FROM dual
 
 select * from users
