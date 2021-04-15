@@ -29,7 +29,11 @@ BEGIN
 				JOIN Auction A  
 				ON A.id = _auctionId AND B.id = A.bestBidId;
 				
-				RETURN _bestBidAmount + (_bestBidAmount * _improvementPercent);
+				IF (_minIncrement > (_bestBidAmount * _improvementPercent)) THEN
+					RETURN _bestBidAmount + _minIncrement;
+				ELSE
+					RETURN _bestBidAmount + (_bestBidAmount * _improvementPercent);
+				END IF;
 			END IF;
 		END;
 	END IF;
