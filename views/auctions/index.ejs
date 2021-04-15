@@ -1,0 +1,59 @@
+<%- include('../partials/header'); %>
+
+<div class="container">
+    <div class="form-group row mt-2">
+        <h2 class="ml-2">Auctions</h2>
+        <% if (!user.isadmin) { %>
+            <a class="btn btn-outline-primary btn-lg mx-3" href="/auctions/new">create</a>
+        <% } %>
+    </div>
+
+
+    <div class="row">
+        <div class="card col-xl-12">
+            <div class="card-body">
+                <form class="form-inline" action='/auctions' method="POST">
+                    <div class="col-xs-2">
+                        <label for="filterBy" class="form-label justify-content-start"><small>Filter By</small></label>
+                        <select id="filterBy" name="filterBy" class="form-control">
+                            <option value='category'>Category</option>
+                            <option value='subcategory'>Subcategory</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xs-4 ml-3">
+                        <label for="category" class="form-label justify-content-start"><small>Category</small></label>
+                        <select id="category" name="category" class="form-control">
+                            <option value='NULL'>All</option>
+                            <% categories.forEach((category) => { %>
+                                <option value='<%= category.id %>'><%= category.name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+                    <div class="col-xs-4 ml-3">
+                        <label for="subcategory" class="form-label justify-content-start"><small>Subcategory</small></label>
+                        <select id="subcategory" name="subcategory" class="form-control ">
+                            <% subcategories.forEach((subcategory) => { %>
+                                <option value='<%= subcategory.id %>'><%= subcategory.name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-xs-2 ml-3 mt-2">
+                        <button class="btn btn-outline-info" type="submit">Filter</button>
+                    </div>
+                <form>
+            </div>
+        </div>
+    </div>
+
+
+    <ul class="list-group mt-3">
+        <% auctions.forEach((auction) => { %>
+            <a href="/auctions/<%= auction.id %>" class="list-group-item list-group-item-action"><%= auction.itemname %>  [closes <%= auction.enddate.split(' ')[0] %>]</a>
+        <% }); %>
+    </ul>
+</div>
+
+<%- include('../partials/footer'); %>

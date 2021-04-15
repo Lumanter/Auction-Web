@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AuctionWeb</title>     
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> 
+    </head>
+    <body>
+
+   <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <a class="navbar-brand" href="/">AuctionWeb</a>
+
+        <ul class="navbar-nav ml-auto">
+            <% if (!user) { %>
+                <a class="nav-item nav-link mx-2" href="/login">Login</a>
+            <% } else if (user.isadmin) { %>
+                <a class="nav-item nav-link mx-2" href="/users/<%= user.id %>"><%= user.nickname %></a>
+                <a class="nav-item nav-link mx-2" href="/auctions">Auctions</a>
+                <a class="nav-item nav-link mx-2" href="/users">Users</a>
+                <a class="nav-item nav-link mx-2" href="/params">Parameters</a>
+                <a class="nav-item nav-link mx-2" href="/logout">Logout</a>
+            <% } else { %>
+                <a class="nav-item nav-link mx-2" href="/users/<%= user.id %>"><%= user.nickname %></a>
+                <a class="nav-item nav-link mx-2" href="/auctions">Auctions</a>
+                <a class="nav-item nav-link mx-2" href="/logout">Logout</a>
+            <% } %>
+        </ul>
+    </nav>
+
+    <div class="container mt-2">  <!-- display flash messages -->
+        <% if (error && error.length > 0) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= error %>
+            </div>
+        <% } %>
+        <% if (success && success.length > 0) { %>
+            <div class="alert alert-success" role="alert">
+                <%= success %>
+            </div>
+        <% } %>
+    </div>

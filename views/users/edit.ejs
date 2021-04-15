@@ -1,0 +1,79 @@
+<%- include('../partials/header'); %>
+
+<div style="width: 40%; margin: 25px auto;">
+    <form action='/users/<%- id %>' method="POST">
+
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Id</span>
+            </div>
+            <input id="id" type="text" class="form-control" name="id"  value='<%- id %>' disabled />
+        </div>
+
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nickname</span>
+            </div>
+            <input  id="nickname" type="text" class="form-control" name="nickname"  value='<%- nickname %>' required  maxLength="20" />
+        </div>
+
+        <div class="form-group">
+            <input id="isAdmin" type="checkbox" name="isAdmin" <%- (isadmin) ? "checked" : '' %> disabled />
+            <label>isAdmin</label>
+        </div>
+
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Email</span>
+            </div>
+            <input id="email" name="email" type="email" class="form-control" placeholder="Email" value='<%- email %>' required />
+        </div>
+
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Password</span>
+            </div>
+            <input id="password" type="password" class="form-control"  name="password" required maxLength="15" /> 
+        </div>
+
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">First Name</span>
+            </div>
+            <input id="firstName" type="text" class="form-control" name="firstName" value='<%- firstname %>' required maxLength="50" />
+        </div>
+
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Last Name</span>
+            </div>
+            <input id="lastName" type="text" class="form-control" name="lastName"  value='<%- lastname %>' required maxLength="50" />
+        </div>
+
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Address</span>
+            </div>
+            <input id="address" type="text" class="form-control" name="address"  value='<%- address %>' maxLength="120" />
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-lg btn-outline-primary btn-block">Update User</button>
+        </div>
+    </form>
+
+    <form action='/users/<%- id %>/phone' method="POST">
+        <div class="input-group mb-2 mt-5">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Phone</span>
+            </div>
+            <input id="phone" type="text" class="form-control" name="phone" maxLength="8" />
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-lg btn-outline-primary btn-block">Add Phone</button>
+        </div>
+    </form>
+</div>
+
+<%- include('../partials/footer'); %>
