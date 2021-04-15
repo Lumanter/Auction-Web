@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION getMinBid(pAuctionId NUMERIC) 
 RETURN numeric
 Is 
-	pImprovementPercent SMALLINT;
-	pMinIncrement       INT;
+	pImprovementPercent  NUMERIC(14, 2);
+	pMinIncrement        NUMERIC(14, 2);
 	pBasePrice          NUMERIC(14, 2);
 	pBestBidAmount      NUMERIC(14, 2);
     countAuction int;
@@ -442,17 +442,16 @@ END;
 -----/////////////////////////////////////////////////////////getLoginUser READY
 
 
--- Create Object of your table
+-- Create Object of your tabledrop type TABLE_LoginUserRES_OBJ force
 CREATE OR REPLACE TYPE TABLE_LoginUserRES_OBJ AS OBJECT (
-    id        INT,
-	isAdmin     CHAR(1),    --/ 'T' from true  /'F' from false
-	nickname    VARCHAR(20),
-	password    VARCHAR(60),  
+    id          INT,
+	isAdmin     char(1) ,   --'T' if is true, 'F' if is false
+	nickname    VARCHAR(20) ,
+	password    VARCHAR(60) ,  -- encrypted via pgcrypto
 	email       VARCHAR(320),
-	firstName   VARCHAR(50),
-	lastName    VARCHAR(50),
-	phoneNumber VARCHAR(8),
-	homeNumber  VARCHAR(8)
+	firstName   VARCHAR(50) ,
+	lastName    VARCHAR(50) ,
+	address     VARCHAR(120)
 );
   
 --Create a type of your object 
@@ -478,8 +477,10 @@ AS
                 U.email ,
                 U.firstName,
                 U.lastName,
-                U.phoneNumber ,
-                U.homeNumber FROM Users U WHERE nickname = pNickname;
+                U.address  FROM Users U WHERE nickname = pNickname;
+                    
+                
+                
 BEGIN
     SELECT COUNT(*) INTO countUser FROM Users WHERE nickname = pNickname;
     IF countUser > 0 then            
@@ -493,8 +494,7 @@ BEGIN
                                                     i.email ,
                                                     i.firstName,
                                                     i.lastName,
-                                                    i.phoneNumber ,
-                                                    i.homeNumber ));
+                                                    i.address ));
               EXIT WHEN CURSEUR_ETAPE%NOTFOUND;
            END LOOP;
         ELSE
@@ -505,7 +505,6 @@ BEGIN
    END IF;
    RETURN;
 END;
-
 
 --///////////////////////////////////////////////////////////////
 
