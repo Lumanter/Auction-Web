@@ -1,28 +1,16 @@
-execute createUser(201280645,'F','Pepe','12345678','example1@gmail.com','Pepe', 'Aguilar', NULL, NULL);
-drop procedure createUser
-select * from users
-
-CREATE or replace PROCEDURE PRUEBA
-AS 
-BEGIN
-    RAISE_APPLICATION_ERROR(-20000,'pepe tiene mucha hamber');
-    --RAISE RAISE 'Error: Null parameter, only phone numbers are optional.';
-		
-END;
-execute prueba
+execute createUser(201280645,'F','Pepe','12345678','example1@gmail.com','Pepe', 'Aguilar', 'Direccion');
 set serveroutput on
 
+
 CREATE or replace PROCEDURE createUser(
-	pId          INTEGER, 
-	pIsAdmin     char,
-	pNickname    VARCHAR,
-	pPassword    VARCHAR,
-	pEmail       VARCHAR,
-	pFirstName   VARCHAR,
-	pLastName    VARCHAR,
-	pPhoneNumber VARCHAR,
-	pHomeNumber  VARCHAR
-)
+	pid          INT, 
+	pisAdmin     char,
+	pnickname    VARCHAR,
+	ppassword    VARCHAR,
+	pemail       VARCHAR,
+	pfirstName   VARCHAR,
+	plastName    VARCHAR,
+	paddress     VARCHAR)
 IS
 countUser integer;
 countNick integer;
@@ -33,7 +21,7 @@ BEGIN
     SELECT count(*) into countEmail FROM Users WHERE email = pEmail;
     IF (pId = NULL OR pIsAdmin IS NULL OR pNickname IS NULL OR 
 		pPassword IS NULL OR pEmail IS NULL  OR 
-		pFirstName = '' OR pLastName = '') 
+		pFirstName = '' OR pLastName = '' or paddress = '') 
         THEN 
 		RAISE_APPLICATION_ERROR(-20000,'Error: Null parameter, only phone numbers are optional.');
 	ELSIF countUser > 0  
@@ -54,13 +42,11 @@ BEGIN
 	ELSE 
 		BEGIN
 			INSERT INTO Users VALUES
-			(pId, pIsAdmin, pNickname,cryptf(pPassword), pEmail, pFirstName, pLastName, pPhoneNumber, pHomeNumber);
+			(pId, pIsAdmin, pNickname,cryptf(pPassword), pEmail, pFirstName, pLastName, paddress);
 			COMMIT;
 		END;
 	END IF;
 END;
-select * from users where password = cryptf('12345678')
-
 
 --Proccedure 2
 
