@@ -3,109 +3,64 @@ Create user usuario identified BY "12345";
 
 --Table AuctionParameter
 CREATE TABLE AuctionParameter (
-    id      INTEGER PRIMARY KEY NOT NULL,
-    improvementPercent  INTEGER NOT NULL,
-    minIncrement        INTEGER NOT NULL,
+    id      INT GENERATED ALWAYS AS IDENTITY primary key,
+    improvementPercent  numeric(14,2) NOT NULL,
+    minIncrement        numeric(14,2) NOT NULL,
 	dateT               TIMESTAMP NOT NULL  
 );
- 
---Sequence that generates the autoincremented id's for table AuctionParameter
-CREATE SEQUENCE AuctionParameter_sequence;
---Trigger that is responsible for assigning the new id for table AuctionParameter
-CREATE OR REPLACE TRIGGER AuctionParameter_on_insert
-  BEFORE INSERT ON AuctionParameter
-  FOR EACH ROW
-BEGIN
-  SELECT AuctionParameter_sequence.nextval
-  INTO :new.id
-  FROM dual;
-END;
+
 
 --Create table category
 CREATE TABLE Category (
-    id   INTEGER  PRIMARY KEY NOT NULL,
+    id   INT GENERATED ALWAYS AS IDENTITY primary key,
     name VARCHAR(50) NOT NULL
 );
---Sequence that generates the autoincremented id's for table Category
-CREATE SEQUENCE Category_sequence;
---Trigger that is responsible for assigning the new id for table Category
-CREATE OR REPLACE TRIGGER Category_on_insert
-  BEFORE INSERT ON Category
-  FOR EACH ROW
-BEGIN
-  SELECT Category_sequence.nextval
-  INTO :new.id
-  FROM dual;
-END;
 
 --Create table for sub category
 CREATE TABLE SubCategory (
-    id      INTEGER PRIMARY KEY  NOT NULL,
-    categoryId  INTEGER REFERENCES Category NOT NULL,
-    name        VARCHAR(50) NOT NULL
+    id      INT GENERATED ALWAYS AS IDENTITY primary key,
+    categoryId  INT REFERENCES Category NOT NULL,
+    name        VARCHAR(100) NOT NULL
     
 );
 
---Sequence that generates the autoincremented id's for table SubCategory
-CREATE SEQUENCE SubCategory_sequence;
---Trigger that is responsible for assigning the new id for table SubCategory
-CREATE OR REPLACE TRIGGER SubCategory_on_insert
-  BEFORE INSERT ON SubCategory
-  FOR EACH ROW
-BEGIN
-  SELECT SubCategory_sequence.nextval
-  INTO :new.id
-  FROM dual;
-END;
 
---Craete tabke Users
-
+--Create table Users
 CREATE TABLE Users (  -- pluralized since a table can't be named User 
-	id        INTEGER PRIMARY KEY NOT NULL,
-	isAdmin     CHAR(1) NOT NULL,    --/ 'T' from true  /'F' from false
+	id          INT PRIMARY KEY,
+	isAdmin     char(1) NOT NULL,   --'T' if is true, 'F' if is false
 	nickname    VARCHAR(20) NOT NULL,
-	password    VARCHAR(60) NOT NULL,  
+	password    VARCHAR(60) NOT NULL,  -- encrypted via pgcrypto
 	email       VARCHAR(320) NOT NULL,
 	firstName   VARCHAR(50) NOT NULL,
 	lastName    VARCHAR(50) NOT NULL,
-	phoneNumber VARCHAR(8),
-	homeNumber  VARCHAR(8)
+	address     VARCHAR(120)
 );
 
+--Create table userphone
+CREATE TABLE UserPhone ( 
+	userId INT NOT NULL REFERENCES Users,
+	phone  VARCHAR(8) NOT NULL,
+	PRIMARY KEY(userId, phone)
+);
 
 --Create table bid
 CREATE TABLE Bid (
-	id        INTEGER PRIMARY KEY NOT NULL,
+	id        INT GENERATED ALWAYS AS IDENTITY primary key,
 	userId    INTEGER REFERENCES Users NOT NULL,
-	amount    INTEGER NOT NULL,
-	dateT      TIMESTAMP NOT NULL
-    
+	amount    numeric(14,2) NOT NULL,
+	dateT      TIMESTAMP NOT NULL  
 );
 
---Sequence that generates the autoincremented id's for table Bid
-CREATE SEQUENCE Bid_sequence;
-
---Trigger that is responsible for assigning the new id for table SubCategory
-drop trigger Bid_on_insert
-CREATE OR REPLACE TRIGGER Bid_on_insert
-  BEFORE INSERT ON Bid
-  FOR EACH ROW
-BEGIN
-  SELECT Bid_sequence.nextval
-  INTO :new.id
-  FROM dual;
-END;
 
 --Create table Auction
-select * from auction 
-alter table Auction modify basePrice        NUMERIC(12,2) not null;
 CREATE TABLE Auction (
-	id              INTEGER PRIMARY KEY NOT NULL,
+	id              INT GENERATED ALWAYS AS IDENTITY primary key, 
 	itemName        VARCHAR(60) NOT NULL,
-	subCategoryId    INTEGER REFERENCES SubCategory NOT NULL,
-	userId          INTEGER REFERENCES Users NOT NULL,
-	bestBidId       INTEGER,
-	basePrice        NUMERIC(12,2) NOT NULL,
+	subCategoryId    INT REFERENCES SubCategory NOT NULL,
+	userId          INT REFERENCES Users NOT NULL,
+	bestBidId       int references bid, --reference to table bid
+	basePrice        NUMERIC(14,2) NOT NULL,
 	startDate       TIMESTAMP NOT NULL,
 	endDate         TIMESTAMP NOT NULL,
 	itemDescription VARCHAR(120) NOT NULL,
@@ -114,40 +69,23 @@ CREATE TABLE Auction (
 	isClosed         CHAR(1) NOT NULL,    --/ 'T' from true  /'F' from false,
 	itemWasSold      CHAR(1)    --/ 'T' from true  /'F' from false
 );
---Sequence that generates the autoincremented id's for table Auction
-CREATE SEQUENCE Auction_sequence;
---Trigger that is responsible for assigning the new id for table Auction
 
-CREATE OR REPLACE TRIGGER Auction_on_insert
-  BEFORE INSERT ON Auction
-  FOR EACH ROW
-BEGIN
-  SELECT Auction_sequence.nextval
-  INTO :new.id
-  FROM dual;
-END;
 
 --add auctionId to table Bid
-ALTER TABLE Bid ADD auctionId INTEGER REFERENCES Auction NOT NULL;
+ALTER TABLE Bid ADD auctionId INT REFERENCES Auction NOT NULL;
 
 --Create table SellerReview
-drop table SellerReview
 CREATE TABLE SellerReview (
-	auctionId INTEGER PRIMARY KEY REFERENCES Auction,
+	auctionId INT PRIMARY KEY REFERENCES Auction,
 	commentt   VARCHAR(120),
 	rating    SMALLINT,
 	dateT      TIMESTAMP NOT NULL
 );
-
 --Create table Buyer Review
-drop table BuyerReview
 CREATE TABLE BuyerReview (
-	auctionId INTEGER PRIMARY KEY REFERENCES Auction,
+	auctionId INT PRIMARY KEY REFERENCES Auction,
 	commentt   VARCHAR(120),
 	rating    SMALLINT,
 	dateT      TIMESTAMP NOT NULL
 );
 
-
-
-alter table Auction modify bestBidId INT;
