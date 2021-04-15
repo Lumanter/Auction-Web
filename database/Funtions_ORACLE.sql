@@ -538,15 +538,14 @@ END;
 
 -- Create Object of your table
 CREATE OR REPLACE TYPE TABLE_AuctionParametersRES_OBJ AS OBJECT (
-    id                  INT,
-    improvementPercent  INT,
-    minIncrement        INT,
-	dateT               TIMESTAMP
+    id      INT ,
+    improvementPercent  numeric(14,2),
+    minIncrement        numeric(14,2),
+	dateT               TIMESTAMP 
 );
-  
+
 --Create a type of your object 
 CREATE TYPE TABLE_AuctionParametersRES AS TABLE OF TABLE_AuctionParametersRES_OBJ;
-
 
 CREATE OR REPLACE FUNCTION getAuctionParameters
 RETURN TABLE_AuctionParametersRES
