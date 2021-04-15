@@ -29,14 +29,12 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20001,'Error: User already exists.');
         
 	ELSIF (LENGTH(pPassword) < 8) THEN
-		RAISE value_error;
-        RAISE_APPLICATION_ERROR(-20002,'Error: The password must be at least 8 digits.');
+	RAISE_APPLICATION_ERROR(-20002,'Error: The password must be at least 8 digits.');
         
 	ELSIF countNick > 0  THEN
         RAISE_APPLICATION_ERROR(-20003,'Error: Nickname not available, please try another.');
         
 	ELSIF countEmail > 0 THEN
-        --RAISE 'Error: Email already registered.';
         RAISE_APPLICATION_ERROR(-20004,'Error: Email already registered.');
         
 	ELSE 
