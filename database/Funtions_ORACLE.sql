@@ -150,30 +150,24 @@ END;
 
 --/////////////////////////////////////////////////////////////////////////////////////////
 ---////////////////////////////////////////---///////////////////////////////////////////////////////////////GetSellerHistory ready  
-drop type TABLE_SellerHistoryRES_OBJ
 -- Create Object of your table
-CREATE TYPE TABLE_SellerHistoryRES_OBJ AS OBJECT (
+CREATE  TYPE TABLE_SellerHistoryRES_OBJ AS OBJECT (
      auctionId     INT,
 	itemName      VARCHAR(60),
-	basePrice     INT,
+	basePrice     NUMERIC(14, 2),
 	startDate     TIMESTAMP,
 	buyerUserId   INT,
 	buyerNickname VARCHAR(20),
-	amount        INT,
-	winDate       TIMESTAMP,
+	amount        NUMERIC(14, 2),
+	isClosed      char(1),
+	itemWasSold   char(1),
 	buyerComment  VARCHAR(120),
 	buyerRating   SMALLINT 
 );
 
 --Create a type of your object 
 CREATE TYPE TABLE_SellerHistoryRES AS TABLE OF TABLE_SellerHistoryRES_OBJ;
-drop type TABLE_SellerHistoryRES
 
-getSellerHistory
-
-
-
-SELECT * FROM (getSellerHistory (202720532))
 
 --Function Use the type created as Return Type
 CREATE OR REPLACE FUNCTION getSellerHistory ( pUserId INT )
@@ -182,8 +176,10 @@ PIPELINED
 AS
     CURSOR CURSEUR_ETAPE
     IS
-        SELECT A.id auctionId, A.itemName, A.basePrice, A.startDate, U.id buyerUserId, 
-                   U.nickname buyerNickname, B.amount, R.dateT winDate, R.commentT buyerComment, R.rating buyerRating
+        SELECT A.id auctionId,itemName, basePrice, startDate, U.id buyerUserId, 
+		   nickname buyerNickname, amount, isClosed, itemWasSold, commentt buyerComment, 
+		   rating buyerRating
+    
             FROM Auction A
             LEFT JOIN SellerReview R
                 ON R.auctionId = A.id 
@@ -196,16 +192,17 @@ AS
 BEGIN
     FOR i IN CURSEUR_ETAPE
     LOOP
-      PIPE ROW (TABLE_SellerHistoryRES_OBJ (i.auctionId,
-                                            i.itemName ,
-                                            i.basePrice,
-                                            i.startDate,
-                                            i.buyerUserId,
-                                            i.buyerNickname,
-                                            i.amount,
-                                            i.winDate,
-                                            i.buyerComment,
-                                            i.buyerRating));
+      PIPE ROW (TABLE_SellerHistoryRES_OBJ (i.auctionId ,
+                                            i.itemName      ,
+                                            i.basePrice     ,
+                                            i.startDate     ,
+                                            i.buyerUserId   ,
+                                            i.buyerNickname ,
+                                            i.amount        ,
+                                            i.isClosed      ,
+                                            i.itemWasSold   ,
+                                            i.buyerComment  ,
+                                        	i.buyerRating));
       EXIT WHEN CURSEUR_ETAPE%NOTFOUND;
    END LOOP;
    RETURN;
@@ -219,8 +216,8 @@ END;
 CREATE TYPE TABLE_BuyerHistoryRES_OBJ AS OBJECT (
      auctionId     INT,
 	itemName      VARCHAR(60),
-	basePrice     INT,
-	amount        INT,
+	basePrice      Numeric(14,2),
+	amount        numeric(14,2),
 	bidDate       TIMESTAMP,
 	sellerComment  VARCHAR(120),
 	sellerRating   SMALLINT
@@ -228,14 +225,9 @@ CREATE TYPE TABLE_BuyerHistoryRES_OBJ AS OBJECT (
 
 --Create a type of your object 
 CREATE TYPE TABLE_BuyerHistoryRES AS TABLE OF TABLE_BuyerHistoryRES_OBJ;
-drop type TABLE_BuyerHistoryRES
-
-getBuyerHistory
 
 
 
-SELECT * FROM (getBuyerHistory (202720532))
-SELECT * FROM BID
 --Function Use the type created as Return Type
 CREATE OR REPLACE FUNCTION getBuyerHistory ( pUserId INT )
 RETURN TABLE_BuyerHistoryRES
@@ -595,18 +587,19 @@ END;
 
 
 -- Create Object of your table
+
 CREATE TYPE TABLE_UsersRES_OBJ AS OBJECT (
-    id        INT,
-	isAdmin     CHAR(1),    --/ 'T' from true  /'F' from false
-	nickname    VARCHAR(20),
-	password    VARCHAR(60),  
+    id          INT ,
+	isAdmin     char(1) ,   --'T' if is true, 'F' if is false
+	nickname    VARCHAR(20) ,
+	password    VARCHAR(60) ,  -- encrypted via pgcrypto
 	email       VARCHAR(320),
-	firstName   VARCHAR(50),
-	lastName    VARCHAR(50),
-	phoneNumber VARCHAR(8),
-	homeNumber  VARCHAR(8)
+	firstName   VARCHAR(50) ,
+	lastName    VARCHAR(50) ,
+	address     VARCHAR(120)
 );
-  
+
+
 --Create a type of your object 
 CREATE TYPE TABLE_UsersRES AS TABLE OF TABLE_UsersRES_OBJ;
 
@@ -626,8 +619,7 @@ AS
             email    ,
             firstName,
             lastName    ,
-            phoneNumber ,
-            homeNumber
+            address
       FROM Users ORDER BY nickname;
 BEGIN
             FOR i IN CURSEUR_ETAPE
@@ -640,8 +632,7 @@ BEGIN
                                                     i.email    ,
                                                     i.firstName,
                                                     i.lastName    ,
-                                                    i.phoneNumber ,
-                                                    i.homeNumber ));
+                                                    i.address ));
               EXIT WHEN CURSEUR_ETAPE%NOTFOUND;
            END LOOP;
     
@@ -668,8 +659,7 @@ AS
             email    ,
             firstName,
             lastName    ,
-            phoneNumber ,
-            homeNumber
+            address
       FROM  Users WHERE id = pId;
 BEGIN
         SELECT count(*) into countUser FROM Users WHERE id = pid;
@@ -684,8 +674,7 @@ BEGIN
                                                     i.email    ,
                                                     i.firstName,
                                                     i.lastName    ,
-                                                    i.phoneNumber ,
-                                                    i.homeNumber ));
+                                                    i.address ));
               EXIT WHEN CURSEUR_ETAPE%NOTFOUND;
            END LOOP;
         else
@@ -739,4 +728,19 @@ BEGIN
 END;
 
 
---/////////////////////////////////////////////////////////////////End.
+--/////////////////////////////////////////////////////////////////
+--/////////////////////////////////////////////////////////////////get userPhones
+
+
+CREATE or replace FUNCTION getUserPhones(pUserId INT)
+RETURN String is 
+phones String(500):='';
+begin
+    for i in (Select userId, phone from UserPhone)
+    loop
+    if i.userId = pUserId then
+        phones := phones || i.phone ||', ';
+    end if;
+    end loop;
+    return phones ;
+end;
