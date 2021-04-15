@@ -5,7 +5,8 @@ CREATE PROCEDURE createUser(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50))
+	_lastName    VARCHAR(50),
+	_address     VARCHAR(120))
 LANGUAGE PLPGSQL AS $$
 BEGIN
     IF ((_id IS NULL) OR (_isAdmin IS NULL) OR (COALESCE(TRIM(_nickname),'') = '') OR 
@@ -28,7 +29,7 @@ BEGIN
 	ELSE
 		BEGIN
 			INSERT INTO Users VALUES
-			(_id, _isAdmin, _nickname, crypt(_password, gen_salt('bf')), _email, _firstName, _lastName);
+			(_id, _isAdmin, _nickname, crypt(_password, gen_salt('bf')), _email, _firstName, _lastName, _address);
 			COMMIT;
 		END;
 	END IF;
@@ -43,7 +44,8 @@ CREATE PROCEDURE updateUser(
 	_password    VARCHAR(15),
 	_email       VARCHAR(320),
 	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50))
+	_lastName    VARCHAR(50),
+	_address     VARCHAR(120))
 LANGUAGE PLPGSQL AS $$
 BEGIN
     IF ((_id IS NULL) OR (COALESCE(TRIM(_nickname),'') = '') OR 
@@ -70,71 +72,12 @@ BEGIN
 				password = crypt(_password, gen_salt('bf')),
 				email = _email,
 				firstName = _firstName,
-				lastName = _lastName
+				lastName = _lastName,
+				address = _address
 			WHERE id = _id;
 			COMMIT;
 		END;
 	END IF;
-END;$$
-
-
-
-
-CREATE PROCEDURE createAdmin(
-	_id          BIGINT,
-	_nickname    VARCHAR(20),
-	_password    VARCHAR(15),
-	_email       VARCHAR(320),
-	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50))
-LANGUAGE PLPGSQL AS $$
-BEGIN
-	CALL createUser(_id, TRUE, _nickname, _password, _email, _firstName, _lastName);
-END;$$
-
-
-
-
-CREATE PROCEDURE updateAdmin(
-	_id          BIGINT,
-	_nickname    VARCHAR(20),
-	_password    VARCHAR(15),
-	_email       VARCHAR(320),
-	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50))
-LANGUAGE PLPGSQL AS $$
-BEGIN
-	CALL updateUser(_id, TRUE, _nickname, _password, _email, _firstName, _lastName);
-END;$$
-
-
-
-
-CREATE PROCEDURE createParticipant(
-	_id          BIGINT,
-	_nickname    VARCHAR(20),
-	_password    VARCHAR(15),
-	_email       VARCHAR(320),
-	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50))
-LANGUAGE PLPGSQL AS $$
-BEGIN
-	CALL createUser(_id, FALSE, _nickname, _password, _email, _firstName, _lastName);
-END;$$
-
-
-
-
-CREATE PROCEDURE updateParticipant(
-	_id          BIGINT,
-	_nickname    VARCHAR(20),
-	_password    VARCHAR(15),
-	_email       VARCHAR(320),
-	_firstName   VARCHAR(50),
-	_lastName    VARCHAR(50))
-LANGUAGE PLPGSQL AS $$
-BEGIN
-	CALL updateUser(_id, FALSE, _nickname, _password, _email, _firstName, _lastName);
 END;$$
 
 

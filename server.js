@@ -104,12 +104,12 @@ app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
 
 
 app.post('/users', async (req, res) => {
-    const {nickname, email, password, firstName, lastName} = req.body;  // take form data
+    const {nickname, email, password, firstName, lastName, address} = req.body;  // take form data
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
     const isAdmin = (req.body.isAdmin !== undefined);
 
-    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7)`;
-    const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName];
+    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7, $8)`;
+    const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName, address];
     
     try {
         await db.query(procedureCall, procedureParams);
@@ -117,7 +117,7 @@ app.post('/users', async (req, res) => {
         res.redirect(`/users/${id}`);
     } catch (error) {
         req.flash("error", error.message);
-        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName});  // pass data to restore user form
+        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, address});  // pass data to restore user form
     }
 });
 
@@ -165,11 +165,11 @@ app.post('/users/:id/phone', [checkIsLogged, checkIsAdmin], async (req, res) => 
 
 
 app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
-    const {nickname, email, password, firstName, lastName} = req.body;
+    const {nickname, email, password, firstName, lastName, address} = req.body;
     const id = req.params.id;
 
-    const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6)`;
-    const procedureParams = [id, nickname, password, email, firstName, lastName];
+    const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6, $7)`;
+    const procedureParams = [id, nickname, password, email, firstName, lastName, address];
 
     try {
         await db.query(procedureCall, procedureParams);
