@@ -84,7 +84,7 @@ CREATE TYPE TABLE_ActiveAuctionsRES_OBJ AS OBJECT (
 	subCategoryId    INT,
 	userId          INT ,
 	bestBidId       INT,
-	basePrice        NUMERIC(12,2),
+	basePrice        NUMERIC(14,2),
 	startDate       TIMESTAMP,
 	endDate         TIMESTAMP,
 	itemDescription VARCHAR(120) ,
