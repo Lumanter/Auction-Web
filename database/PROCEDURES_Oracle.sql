@@ -245,11 +245,12 @@ countAuction integer;
 dateAux TIMESTAMP;
 BEGIN 
     
-    SELECT endDate into dateAux  FROM Auction WHERE id = pAuctionId;
     SELECT count(*) into countUser FROM Users WHERE id = pUserId;
     SELECT count(*) into countAuction FROM Auction WHERE id = pAuctionId;
-	
-    IF (pUserId IS NULL OR pAmount IS NULL OR pAuctionId IS NULL) THEN
+	IF countAuction > 0 THEN
+        SELECT endDate into dateAux  FROM Auction WHERE id = pAuctionId;
+        END IF;
+        IF (pUserId IS NULL OR pAmount IS NULL OR pAuctionId IS NULL) THEN
 		RAISE_APPLICATION_ERROR(-20019,'Error: Null parameter, all required.');
 		
 	ELSIF countUser < 1 THEN
@@ -272,7 +273,6 @@ BEGIN
 		END;
 	END IF;
 END;
-
 
 
 CREATE OR REPLACE PROCEDURE createAuctionParameter(
