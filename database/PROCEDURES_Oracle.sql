@@ -236,10 +236,9 @@ END;
 
 
 CREATE or replace PROCEDURE createBid(
-	pUserId    INTEGER,
+	pUserId    INT,
 	pAmount    numeric,
-	pAuctionId INTEGER
-)
+	pAuctionId INT)
 IS
 countUser integer;
 countAuction integer;
@@ -273,7 +272,6 @@ BEGIN
 		END;
 	END IF;
 END;
-
 
 
 
