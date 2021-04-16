@@ -48,10 +48,10 @@ END;
 
 --Proccedure 2
 
+
 CREATE or replace PROCEDURE updateUser(
-	pId         INTEGER, 
-	pIsAdmin     char,
-	pNickname    VARCHAR,
+	pId         INTEGER,
+    pNickname    VARCHAR,
 	pPassword    VARCHAR,
 	pEmail       VARCHAR,
 	pFirstName   VARCHAR,
@@ -71,7 +71,7 @@ BEGIN
     if countUser  > 0 THEN
         SELECT isAdmin into auxIsadmin FROM Users WHERE id = pId;
     end if;
-    IF (pId IS NULL OR pIsAdmin IS NULL OR pNickname is null OR 
+    IF (pId IS NULL OR  pNickname is null OR 
 		pPassword is null OR pEmail is null  OR 
 		pFirstName is null OR pLastName is null or paddress is null) THEN
 		RAISE_APPLICATION_ERROR(-20005,'Error: Null parameter');
@@ -88,9 +88,7 @@ BEGIN
 	ELSIF countEmail > 0 THEN
         RAISE_APPLICATION_ERROR(-20009,'Error: Email already in use, please try another.');
 	
-	ELSIF auxIsAdmin != pIsAdmin THEN
-	    RAISE_APPLICATION_ERROR(-20010,'Error: Admins can''t be updated to participants, or vice versa.');
-	
+
 	ELSE
 		BEGIN
 			UPDATE Users
