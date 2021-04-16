@@ -39,7 +39,6 @@ Is
     countAuction int;
     auxBid int;
 BEGIN
-	
     select * into pImprovementPercent from (Select improvementPercent 
     from AuctionParameter where rownum < (select count(*) from AuctionParameter )+1 order by rownum desc) where rownum <=1;
     select * into pMinIncrement from (SELECT minIncrement
@@ -48,13 +47,15 @@ BEGIN
 	SELECT count(*) into countAuction FROM Auction WHERE id = pAuctionId;
       
     
-      SELECT bestBidId into auxBid FROM Auction WHERE id = pAuctionId;
+      
       
 	IF (countAuction < 1) THEN
 		RETURN 0;
 		
 	ELSE
-		BEGIN
+        BEGIN
+        SELECT bestBidId into auxBid FROM Auction WHERE id = pAuctionId;
+		
 			SELECT basePrice 
 			INTO pBasePrice 
 			FROM Auction WHERE id = pAuctionId;
@@ -67,15 +68,18 @@ BEGIN
 				INTO pBestBidAmount
 				FROM Bid B
 				JOIN Auction A  
-				ON A.id = 1 AND B.id = A.bestBidId;
-				
-				RETURN ROUND(pBestBidAmount + (pBestBidAmount * (pImprovementPercent / 100.0)));
+				ON A.id = pAuctionId AND B.id = A.bestBidId;
+			
+               			IF (pMinIncrement > (pBestBidAmount * pImprovementPercent)) THEN
+					RETURN pBestBidAmount + pMinIncrement;
+				ELSE
+					RETURN pBestBidAmount + (pBestBidAmount * pImprovementPercent);
+				END IF;
+
 			END IF;
 		END;
 	END IF;
 END;
-
-
 --/////////////////////////////////////////////////////getActiveAuctions ready
 
 CREATE TYPE TABLE_ActiveAuctionsRES_OBJ AS OBJECT (
