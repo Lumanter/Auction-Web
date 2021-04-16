@@ -6,12 +6,13 @@ const express = require('express'),
     fileUpload = require('express-fileupload');
 
 const {initializePassport} = require('./passportConfig');
-const {query, parseUser, parseError, parseSellerHistory, parseBuyerHistory} = require('./dbConfig');
+const {query, parseUser, parseError, parseSellerHistory, parseBuyerHistory, parseAuction} = require('./dbConfig');
 const {checkIsLogged, checkIsNotLogged, checkIsAdmin, checkIsNotAdmin} = require('./middleware');
 
     
 initializePassport(passport);  // use custom strategy
     
+
 // MIDDLEWARES
 app.set("view engine", "ejs");  // use ejs
 app.use(express.urlencoded({extended: true}))  // middleware to receive form data in (req.body.param)
@@ -196,9 +197,18 @@ app.get('/auctions', checkIsLogged, async (req, res) => {
         categories = [],
         subcategories = [];
     try {
-        auctions = (await query('SELECT * FROM getActiveAuctions(NULL, NULL)')).rows;
-        categories = (await query('SELECT * FROM getActiveCategories()')).rows;
-        subcategories = (await query('SELECT * FROM getActiveSubCategories()')).rows;
+        auctions = await query('SELECT * FROM getActiveAuctions(NULL, NULL)');
+        auctions = auctions.map((auction) => parseAuction(auction));
+
+        categories = await query('SELECT * FROM getActiveCategories()');
+        categories = categories.map((category) => {
+            return { id: category.ID, name: category.NAME }
+        });
+
+        subcategories = await query('SELECT * FROM getActiveSubCategories()');
+        subcategories = subcategories.map((subcategory) => {
+            return { id: subcategory.ID, categoryid: subcategory.CATEGORYID, name: subcategory.NAME }
+        });
     } catch (error) {}
     res.render('auctions', {auctions, categories, subcategories});
 });
@@ -209,18 +219,28 @@ app.post('/auctions', async (req, res) => {
     const categoryId = (filterByCategory) ? req.body.category : 'NULL';
     const subCategoryId = (!filterByCategory) ? req.body.subcategory : 'NULL';
 
-    let auctions = {},
-        categories = {},
-        subcategories = {};
+    let auctions = [],
+        categories = [],
+        subcategories = [];
     try {
-        categories = (await query('SELECT * FROM getActiveCategories()')).rows;
-        subcategories = (await query('SELECT * FROM getActiveSubCategories()')).rows;
-        auctions = (await query(`SELECT * FROM getActiveAuctions(${categoryId}, ${subCategoryId})`)).rows;
+        categories = await query('SELECT * FROM getActiveCategories()');
+        categories = categories.map((category) => {
+            return { id: category.ID, name: category.NAME }
+        });
+
+        subcategories = await query('SELECT * FROM getActiveSubCategories()');
+        subcategories = subcategories.map((subcategory) => {
+            return { id: subcategory.ID, categoryid: subcategory.CATEGORYID, name: subcategory.NAME }
+        });
+
+        auctions = await query(`SELECT * FROM getActiveAuctions(${categoryId}, ${subCategoryId})`);
+        auctions = auctions.map((auction) => parseAuction(auction));
     } catch (error) {
         console.log(error.message);
     }
     res.render('auctions', {auctions, categories, subcategories});
 });
+
 
 app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
     let subcategories = {};

@@ -77,4 +77,23 @@ function parseBuyerHistory(history) {
 }
 
 
-module.exports = {dbConfig, query, parseUser, parseError, parseDate, parseSellerHistory, parseBuyerHistory};
+function parseAuction(auction) {
+    return {
+        id: auction.ID,
+        itemname: auction.ITEMNAME,
+        subcategoryid: auction.SUBCATEGORYID,
+        userid: auction.USERID,
+        bestbidid: auction.BESTBIDID,
+        baseprice: auction.BASEPRICE,
+        startdate: parseDate(auction.STARTDATE),
+        enddate: parseDate(auction.ENDDATE),
+        itemdescription: auction.ITEMDESCRIPTION,
+        deliverydetails: auction.DELIVERYDETAILS,
+        itemphoto: auction.ITEMPHOTO,
+        isClosed: (auction.ISCLOSED ? auction.ISCLOSED == 'T' : null),
+        itemWasSold: (auction.ITEMWASSOLD ? auction.ITEMWASSOLD == 'T' : null)
+    }
+}
+
+
+module.exports = {dbConfig, query, parseUser, parseError, parseDate, parseSellerHistory, parseBuyerHistory, parseAuction};
