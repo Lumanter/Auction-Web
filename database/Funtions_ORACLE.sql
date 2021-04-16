@@ -216,16 +216,16 @@ END;
 CREATE TYPE TABLE_BuyerHistoryRES_OBJ AS OBJECT (
      auctionId     INT,
 	itemName      VARCHAR(60),
-	basePrice      Numeric(14,2),
-	amount        numeric(14,2),
+	basePrice     NUMERIC(14, 2),
+	amount        NUMERIC(14, 2),
 	bidDate       TIMESTAMP,
-	sellerComment  VARCHAR(120),
-	sellerRating   SMALLINT
+	winDate       TIMESTAMP,
+	sellerComment VARCHAR(120),
+	sellerRating  SMALLINT
 );
 
 --Create a type of your object 
 CREATE TYPE TABLE_BuyerHistoryRES AS TABLE OF TABLE_BuyerHistoryRES_OBJ;
-
 
 
 --Function Use the type created as Return Type
@@ -236,7 +236,7 @@ AS
     CURSOR CURSEUR_ETAPE
     IS
             SELECT A.id auctionId, A.itemName, A.basePrice, B.amount, 
-            B.datet bidDate , R.commentt sellerComment, R.rating sellerRating
+            B.datet bidDate ,R.datet winDate , R.commentt sellerComment, R.rating sellerRating
             FROM Bid B
             JOIN Auction A
             ON B.auctionId = A.id AND
@@ -253,13 +253,13 @@ BEGIN
                                             i.basePrice,
                                             i.amount,
                                             i.bidDate,
+                                            i.winDate,
                                             i.sellerComment,
                                             i.sellerRating));
       EXIT WHEN CURSEUR_ETAPE%NOTFOUND;
    END LOOP;
    RETURN;
 END;
-
 --///////////////////////////////////////Do not touch
 
 

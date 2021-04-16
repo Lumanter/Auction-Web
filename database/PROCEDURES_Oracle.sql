@@ -312,7 +312,6 @@ END;
 
 
 
-
 CREATE OR REPLACE PROCEDURE updateSellerReview(
 	pAuctionId INTEGER,
 	pComment   VARCHAR,
