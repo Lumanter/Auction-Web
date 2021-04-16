@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', checkIsNotLogged, (req, res) => {
-    res.render('login');
+    res.render('login', {nickname: 'the_seller'});
 });
 
 
@@ -245,9 +245,22 @@ app.post('/auctions', async (req, res) => {
 app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
     let subcategories = {};
     try {
-        subcategories = (await query('SELECT * FROM getSubCategories()')).rows;
+        subcategories = await query('SELECT * FROM getSubCategories()');
+        subcategories = subcategories.map((i) => {
+            return {
+                id: i.ID,
+                categoryid: i.CATEGORYID,
+                name: i.NAME
+            }
+        });
     } catch (error) {}
-    res.render('auctions/new', {subcategories});
+
+    const itemName = 'Scissors', 
+        basePrice = 5000, 
+        itemDescription = 'Good state', 
+        deliveryDetails = 'Heredia', 
+        endDate = '2021-05-22T00:00:00';
+    res.render('auctions/new', {subcategories, itemName, basePrice, itemDescription, deliveryDetails, endDate});
 });
 
 
@@ -257,26 +270,31 @@ app.post('/auctions/new', async (req, res) => {
     const userId = req.user.id;
     let itemPhoto = null;
     if (req.files) {
-        itemPhoto = req.files.itemPhoto.data;  // image as blob object (accepted in PostgreSQL BYTEA field)
+        itemPhoto = req.files.itemPhoto.data;  // image as blob object
     }
-    
-    const procedureCall = 'CALL createAuction($1, $2, $3, $4, $5, $6, $7, $8);'
-    const procedureParams = [itemName, subCategoryId, userId, basePrice, endDate, itemDescription, deliveryDetails, itemPhoto];
+
+    const procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate}', '${itemDescription}', '${deliveryDetails}', :1)`
+    const procedureParams = [itemPhoto];
 
     try {
         await query(procedureCall, procedureParams);
         req.flash("success", `Auction ${itemName} created`);
         res.redirect('/auctions');
     } catch (error) {
-        let subcategories = {};
+        let subcategories = [];
         try {
-            subcategories = (await query('SELECT * FROM getSubCategories()')).rows;
+            subcategories = await query('SELECT * FROM getSubCategories()');
+            subcategories = subcategories.map((i) => {
+                return {
+                    id: i.ID,
+                    categoryid: i.CATEGORYID,
+                    name: i.NAME
+                }
+            });
         } catch (error) {}
-
-        req.flash("error", error.message);
+        req.flash("error", parseError(error));
         res.render('auctions/new', {error: req.flash("error"), subcategories, itemName, basePrice, itemDescription, deliveryDetails, endDate: endDate.replace(' ', 'T')});
     }
-    
 });
 
 
