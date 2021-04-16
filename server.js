@@ -78,7 +78,7 @@ app.post('/params', async (req, res) => {
     const {improvementpercent, minincrement} = req.body;
     console.log(improvementpercent, ':', minincrement)
     try {
-    await query(`BEGIN createAuctionParameter(${improvementpercent}, ${minincrement}); END;`);
+    await query(`CALL createAuctionParameter(${improvementpercent}, ${minincrement})`);
         req.flash("success", "Auction parameters updated!");
         res.redirect('/auctions');
     } catch (error) {
@@ -167,7 +167,7 @@ app.post('/users/:id/phone', [checkIsLogged, checkIsAdmin], async (req, res) => 
         req.flash("success", `Phone added`);
         res.redirect(`/users/${id}`);
     } catch (error) {
-        req.flash("error", error.message);
+        req.flash("error", parseError(message));
         res.redirect(`/users/${id}/edit`)
     }   
 });
