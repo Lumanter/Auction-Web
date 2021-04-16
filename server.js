@@ -66,8 +66,8 @@ app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let currentParams = null;  // set current params if available
     try {
         const results = await query('SELECT * FROM getAuctionParameters()');
-        if (results.rows.length > 0) {
-            currentParams = results.rows[0];
+        if (results.length > 0) {
+            currentParams = results[0];
         }
     } catch (error) {}
     res.render('params', {params: currentParams});
@@ -76,13 +76,14 @@ app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
 
 app.post('/params', async (req, res) => {
     const {improvementpercent, minincrement} = req.body;
+    console.log(improvementpercent, ':', minincrement)
     try {
-        await query('CALL createAuctionParameter($1, $2)', [improvementpercent, minincrement]);
+    await query(`BEGIN createAuctionParameter(${improvementpercent}, ${minincrement}); END;`);
         req.flash("success", "Auction parameters updated!");
         res.redirect('/auctions');
     } catch (error) {
-        req.flash("error", error.message);
-        res.render('params', {error: req.flash("error"), params: {improvementpercent, minincrement}});
+        req.flash("error", parseError(error));
+        res.render('params', {error: req.flash("error"), params: {IMPROVEMENTPERCENT: improvementpercent, MININCREMENT: minincrement}});
     }
 });
 
