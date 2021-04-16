@@ -63,4 +63,18 @@ function parseSellerHistory(history) {
 }
 
 
-module.exports = {dbConfig, query, parseUser, parseError, parseDate, parseSellerHistory};
+function parseBuyerHistory(history) {
+    return {
+        auctionid: history.AUCTIONID,
+        itemname: history.ITEMNAME,
+        baseprice: history.BASEPRICE,
+        amount: history.AMOUNT,
+        biddate: parseDate(history.BIDDATE),
+        windate: (history.WINDATE ? parseDate(history.WINDATE) : null),
+        sellercomment: history.SELLERCOMMENT,
+        sellerrating: history.SELLERRATING
+    }
+}
+
+
+module.exports = {dbConfig, query, parseUser, parseError, parseDate, parseSellerHistory, parseBuyerHistory};
