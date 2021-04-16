@@ -108,9 +108,9 @@ app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
 app.post('/users', async (req, res) => {
     const {nickname, email, password, firstName, lastName, address} = req.body;  // take form data
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
-    const isAdmin = (req.body.isAdmin !== undefined);
+    const isAdmin = ((req.body.isAdmin !== undefined) ? 'T' : 'F');
 
-    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7, $8)`;
+    const procedureCall = `CALL createUser(:1, :2, :3, :4, :5, :6, :7, :8)`;
     const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName, address];
     
     try {
@@ -118,8 +118,8 @@ app.post('/users', async (req, res) => {
         req.flash("success", `User ${nickname} created`);
         res.redirect(`/users/${id}`);
     } catch (error) {
-        req.flash("error", error.message);
-        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, address});  // pass data to restore user form
+        req.flash("error", parseError(error));
+        res.render('users/new', {error: req.flash("error"), id, isAdmin: (isAdmin == 'T'), nickname, email, firstName, lastName, address});  // pass data to restore user form
     }
 });
 
@@ -152,7 +152,7 @@ app.get('/users/:id/edit', [checkIsLogged, checkIsAdmin], async (req, res) => {
         const editUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
         res.render('users/edit', {...editUser});
     } catch (error) {
-        req.flash("error", error.message);
+        req.flash("error", parseError(error));
         res.redirect('/users');
     }
 });
@@ -177,7 +177,7 @@ app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
     const {nickname, email, password, firstName, lastName, address} = req.body;
     const id = req.params.id;
 
-    const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6, $7)`;
+    const procedureCall = `CALL updateUser(:1, :2, :3, :4, :5, :6, :7)`;
     const procedureParams = [id, nickname, password, email, firstName, lastName, address];
 
     try {
@@ -185,7 +185,7 @@ app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
         req.flash("success", `User ${nickname} updated`);
         res.redirect(`/users/${id}`);
     } catch (error) {
-        req.flash("error", error.message);
+        req.flash("error", parseError(error));
         res.redirect(`/users/${id}/edit`)
     }
 });
