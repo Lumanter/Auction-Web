@@ -408,6 +408,7 @@ CREATE OR REPLACE TYPE TABLE_AuctionInfoRES_OBJ AS OBJECT (
 CREATE TYPE TABLE_AuctionInfoRES AS TABLE OF TABLE_AuctionInfoRES_OBJ;
 DROP TYPE TABLE_AuctionInfoRES
 
+
 CREATE OR REPLACE FUNCTION getAuctionInfo(pId INT)
 RETURN TABLE_AuctionInfoRES
 PIPELINED
@@ -424,7 +425,7 @@ AS
 			   A.isClosed, B.userId winnerId
 		FROM Auction A
 		JOIN SubCategory S
-			ON A.subCategoryId = S.id AND A.id = 1
+			ON A.subCategoryId = S.id AND A.id = pId
 		JOIN Users U
 			ON U.id = A.userId
 		LEFT JOIN Bid B
