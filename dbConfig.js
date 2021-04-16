@@ -43,4 +43,24 @@ function parseError(error) {
 }
 
 
-module.exports = {dbConfig, query, parseUser, parseError};
+const parseDate = (date) => date.toISOString().replace('T', ' ').replace('Z', ' ').split('.')[0];
+
+
+function parseSellerHistory(history) {
+    return {
+        auctionid: history.AUCTIONID,
+        itemname: history.ITEMNAME,
+        baseprice: history.BASEPRICE,
+        startdate: parseDate(history.STARTDATE),
+        buyerUserId: history.BUYERUSERID,
+        buyerNickname: history.BUYERNICKNAME,
+        amount: history.AMOUNT,
+        isClosed: (history.ISCLOSED ? history.ISCLOSED == 'T' : null),
+        itemWasSold: (history.ITEMWASSOLD ? history.ITEMWASSOLD == 'T' : null),
+        buyerComment: history.BUYERCOMMENT,
+        buyerRating: history.BUYERRATING
+    }
+}
+
+
+module.exports = {dbConfig, query, parseUser, parseError, parseDate, parseSellerHistory};

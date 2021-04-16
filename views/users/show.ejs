@@ -73,7 +73,7 @@
                                 <br>
                                 <small>Base price ₡<%= bid.baseprice %></small>
                                 <br>
-                                <small><em><%= bid.biddate.split(' ')[0] %> at <%= bid.biddate.split(' ')[1].slice(0, -7) %></em></small>
+                                <small><em><%= bid.biddate.split(' ')[0] %> at <%= bid.biddate.split(' ')[1] %></em></small>
                                 <% if (bid.windate) { %>
                                     <h5 class="text-center text-warning">Winner bid!</h5>
                                 <% } %>
@@ -102,7 +102,7 @@
                                 <br>
                                 <small>starting  at ₡<%= auction.baseprice %></small>
                                 <br>
-                                <small><em><%= auction.startdate.split(' ')[0] %> at <%= auction.startdate.split(' ')[1].slice(0, -7) %></em></small>
+                                <small><em><%= auction.startdate.split(' ')[0] %> at <%= auction.startdate.split(' ')[1] %></em></small>
                                 <% if (auction.isclosed) { %>
                                     <% if (auction.buyeruserid) { %>
                                         <h5 class="text-center text-warning mt-2">Closed with winner</h5>

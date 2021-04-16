@@ -6,7 +6,7 @@ const express = require('express'),
     fileUpload = require('express-fileupload');
 
 const {initializePassport} = require('./passportConfig');
-const {query, parseUser, parseError} = require('./dbConfig');
+const {query, parseUser, parseError, parseSellerHistory} = require('./dbConfig');
 const {checkIsLogged, checkIsNotLogged, checkIsAdmin, checkIsNotAdmin} = require('./middleware');
 
     
@@ -127,12 +127,12 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
     try {
         const userId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
         const shownUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
-        // const phones = (await query(`SELECT getUserPhones(${userId})`)).rows[0].getuserphones;
-        const phones = '';
+        let phones = (await query(`SELECT getUserPhones(${userId}) FROM DUAL`))[0];
+        phones = phones[Object.keys(phones)[0]]; 
         // const buyerHistory = (await query(`SELECT * FROM getBuyerHistory(${userId})`)).rows;
         const buyerHistory = [];
-        // const sellerHistory = (await query(`SELECT * FROM getSellerHistory(${userId})`)).rows;
-        const sellerHistory = [];
+        let sellerHistory = await query(`SELECT * FROM getSellerHistory(${userId})`);
+        sellerHistory = sellerHistory.map((item) => parseSellerHistory(item));
         res.render('users/show', {shownUser, phones, buyerHistory, sellerHistory});
     } catch (error) {
         req.flash("error", parseError(error));
