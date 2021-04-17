@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', checkIsNotLogged, (req, res) => {
-    res.render('login', {nickname: 'the_buyer'});
+    res.render('login', {nickname: 'the_seller'});
 });
 
 
@@ -254,21 +254,24 @@ app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
         });
     } catch (error) {}
 
-    res.render('auctions/new', {subcategories});
+    res.render('auctions/new', {subcategories, itemName: 't', basePrice: 1, itemDescription: 't', deliveryDetails: 't', endDate: '2022-05-28T00:00:00'});
 });
 
 
 app.post('/auctions/new', async (req, res) => {
     const {itemName, subCategoryId, basePrice, itemDescription, deliveryDetails} = req.body;
-    const endDate = req.body.endDate.replace('T', ' ');
+    let endDate = req.body.endDate.replace('T', ' ');
     const userId = req.user.id;
-    let itemPhoto = null;
+    let procedureCall = '';
+    let procedureParams = '';
     if (req.files) {
-        itemPhoto = req.files.itemPhoto.data;  // image as blob object
+        const itemPhoto = req.files.itemPhoto.data;  // image as blob object
+        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate}', '${itemDescription}', '${deliveryDetails}', :1)`;
+        procedureParams = [itemPhoto];
+    } else {
+        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate}', '${itemDescription}', '${deliveryDetails}', NULL)`;
+        procedureParams = [];
     }
-
-    const procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate}', '${itemDescription}', '${deliveryDetails}', :1)`
-    const procedureParams = [itemPhoto];
 
     try {
         await query(procedureCall, procedureParams);
@@ -285,7 +288,7 @@ app.post('/auctions/new', async (req, res) => {
                     name: i.NAME
                 }
             });
-        } catch (error) {}
+        } catch (e) {}
         req.flash("error", parseError(error));
         res.render('auctions/new', {error: req.flash("error"), subcategories, itemName, basePrice, itemDescription, deliveryDetails, endDate: endDate.replace(' ', 'T')});
     }
