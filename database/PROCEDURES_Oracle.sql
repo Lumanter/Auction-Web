@@ -311,7 +311,7 @@ END;
 CREATE OR REPLACE PROCEDURE updateSellerReview(
 	pAuctionId INTEGER,
 	pComment   VARCHAR,
-	pRating    smallint)
+	pRating    int)
 IS
 countSeller integer;
 BEGIN
@@ -323,7 +323,7 @@ BEGIN
 	ELSIF countSeller < 1 THEN
         RAISE_APPLICATION_ERROR(-20026,'Error: Can''t leave review, auction still open.');
 		
-	ELSIF (pRating IS NOT NULL AND pRating < 0 OR pRating > 5) THEN
+	ELSIF pRating IS NOT NULL AND (pRating < 0 OR pRating > 5) THEN
         RAISE_APPLICATION_ERROR(-20027,'Error: Rating must be between 0 and 5.');
 		
 		
@@ -340,11 +340,10 @@ END;
 
 
 
-
 CREATE OR REPLACE PROCEDURE updateBuyerReview(
 	pAuctionId   INTEGER,
 	pComment     VARCHAR,
-	pRating      smallInt,
+	pRating      Int,
 	pItemWasSold CHAR
 )
 IS
@@ -380,31 +379,36 @@ END;
 
 
 
-CREATE or replace PROCEDURE updateClosedAuctions()
-is
 
-	auctionRow RECORD;
+CREATE OR REPLACE PROCEDURE updateClosedAuctions
+is
+    CountSR int;
+    countBR INT;
 BEGIN
-	FOR auctionRow IN SELECT * FROM Auction  -- implicit cursor
+
+	FOR auctionRow IN (select * from Auction)-- implicit cursor
 	LOOP
-    end loop;
-end;		IF auctionRow.isClosed = FALSE AND
+		IF auctionRow.isClosed = 'F' AND
 			auctionRow.endDate <= current_TIMESTAMP THEN
 			BEGIN
 				UPDATE Auction
-				SET isClosed = TRUE
+				SET isClosed = 'T'
 				WHERE id = auctionRow.id;
-				COMMIT;
-				
+				COMMIT;				
 				IF auctionRow.bestBidId IS NOT NULL THEN
 					BEGIN
-						INSERT INTO SellerReview (auctionId, dateT) VALUES
-						(auctionRow.id, CURRENT_TIMESATMP);
-						COMMIT;
-				
-						INSERT INTO BuyerReview (auctionId, dateT) VALUES
-						(auctionRow.id, CURRENT_TIMESATMP);
-						COMMIT;
+                        select count(*) into CountSR  from SellerReview WHERE auctionId = auctionRow.id;
+						IF countSR < 1  THEN
+							INSERT INTO SellerReview (auctionId, dateT) VALUES
+							(auctionRow.id, current_TIMESTAMP);
+							COMMIT;
+						END IF;
+						 select count(*) into countBR from buyerReview WHERE auctionId = auctionRow.id;
+						IF countBR < 1 THEN
+							INSERT INTO BuyerReview (auctionId, dateT) VALUES
+							(auctionRow.id, current_TIMESTAMP);
+							COMMIT;
+						END IF;
 					END;
 				END IF;
 			END;
