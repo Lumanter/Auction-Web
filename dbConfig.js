@@ -56,7 +56,7 @@ function parseSellerHistory(history) {
         buyernickname: history.BUYERNICKNAME,
         amount: history.AMOUNT,
         isclosed: (history.ISCLOSED ? history.ISCLOSED == 'T' : null),
-        itemwasSold: (history.ITEMWASSOLD ? history.ITEMWASSOLD == 'T' : null),
+        itemwassold: (history.ITEMWASSOLD ? history.ITEMWASSOLD == 'T' : null),
         buyercomment: history.BUYERCOMMENT,
         buyerrating: history.BUYERRATING
     }
