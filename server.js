@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', checkIsNotLogged, (req, res) => {
-    res.render('login', {nickname: 'the_seller'});
+    res.render('login');
 });
 
 
