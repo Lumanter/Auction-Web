@@ -254,24 +254,25 @@ app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
         });
     } catch (error) {}
 
-    res.render('auctions/new', {subcategories, itemName: 't', basePrice: 1, itemDescription: 't', deliveryDetails: 't', endDate: '2022-05-28T00:00:00'});
+    res.render('auctions/new', {subcategories});
+    // res.render('auctions/new', {subcategories, itemName:'t', basePrice:1, itemDescription:'t', deliveryDetails:'t', endDate: '2021-04-17T00:00:00'});
 });
 
 
 app.post('/auctions/new', async (req, res) => {
     const {itemName, subCategoryId, basePrice, itemDescription, deliveryDetails} = req.body;
-    let endDate = req.body.endDate.replace('T', ' ');
+    const endDate = req.body.endDate.replace('T', ' ');
     const userId = req.user.id;
     let procedureCall = '';
-    let procedureParams = '';
+    let procedureParams = [];
     if (req.files) {
         const itemPhoto = req.files.itemPhoto.data;  // image as blob object
-        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate}', '${itemDescription}', '${deliveryDetails}', :1)`;
+        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', :1)`;
         procedureParams = [itemPhoto];
     } else {
-        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate}', '${itemDescription}', '${deliveryDetails}', NULL)`;
-        procedureParams = [];
+        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', NULL)`;
     }
+    console.log(procedureCall);
 
     try {
         await query(procedureCall, procedureParams);
