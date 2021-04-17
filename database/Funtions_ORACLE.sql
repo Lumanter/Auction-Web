@@ -39,15 +39,10 @@ Is
     countAuction int;
     auxBid int;
 BEGIN
-    select * into pImprovementPercent from (Select improvementPercent 
-    from AuctionParameter where rownum < (select count(*) from AuctionParameter )+1 order by rownum desc) where rownum <=1;
-    select * into pMinIncrement from (SELECT minIncrement
-    FROM AuctionParameter where rownum < (select count(*) from AuctionParameter )+1 order by rownum desc) where rownum <=1;
+    select improvementPercent into pImprovementPercent from getAuctionParameters();
+    select minIncrement into pMinIncrement from getAuctionParameters();
     
-	SELECT count(*) into countAuction FROM Auction WHERE id = pAuctionId;
-      
-    
-      
+	SELECT count(*) into countAuction FROM Auction WHERE id = pAuctionId;      
       
 	IF (countAuction < 1) THEN
 		RETURN 0;
@@ -70,7 +65,7 @@ BEGIN
 				JOIN Auction A  
 				ON A.id = pAuctionId AND B.id = A.bestBidId;
 			
-               			IF (pMinIncrement > (pBestBidAmount * pImprovementPercent)) THEN
+               IF (pMinIncrement > (pBestBidAmount * pImprovementPercent)) THEN
 					RETURN pBestBidAmount + pMinIncrement;
 				ELSE
 					RETURN pBestBidAmount + (pBestBidAmount * pImprovementPercent);
