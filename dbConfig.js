@@ -52,13 +52,13 @@ function parseSellerHistory(history) {
         itemname: history.ITEMNAME,
         baseprice: history.BASEPRICE,
         startdate: parseDate(history.STARTDATE),
-        buyerUserId: history.BUYERUSERID,
-        buyerNickname: history.BUYERNICKNAME,
+        buyeruserid: history.BUYERUSERID,
+        buyernickname: history.BUYERNICKNAME,
         amount: history.AMOUNT,
-        isClosed: (history.ISCLOSED ? history.ISCLOSED == 'T' : null),
-        itemWasSold: (history.ITEMWASSOLD ? history.ITEMWASSOLD == 'T' : null),
-        buyerComment: history.BUYERCOMMENT,
-        buyerRating: history.BUYERRATING
+        isclosed: (history.ISCLOSED ? history.ISCLOSED == 'T' : null),
+        itemwasSold: (history.ITEMWASSOLD ? history.ITEMWASSOLD == 'T' : null),
+        buyercomment: history.BUYERCOMMENT,
+        buyerrating: history.BUYERRATING
     }
 }
 
@@ -90,8 +90,8 @@ function parseAuction(auction) {
         itemdescription: auction.ITEMDESCRIPTION,
         deliverydetails: auction.DELIVERYDETAILS,
         itemphoto: auction.ITEMPHOTO,
-        isClosed: (auction.ISCLOSED ? auction.ISCLOSED == 'T' : null),
-        itemWasSold: (auction.ITEMWASSOLD ? auction.ITEMWASSOLD == 'T' : null)
+        isclosed: (auction.ISCLOSED ? auction.ISCLOSED == 'T' : null),
+        itemwassold: (auction.ITEMWASSOLD ? auction.ITEMWASSOLD == 'T' : null)
     }
 }
 

@@ -136,8 +136,8 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
         buyerHistory = buyerHistory.map((item) => parseBuyerHistory(item));
 
         let sellerHistory = await query(`SELECT * FROM getSellerHistory(${userId})`);
-        sellerHistory = sellerHistory.map((item) => parseSellerHistory(item));
-        
+        sellerHistory = sellerHistory.map((item) => parseSellerHistory(item)); 
+
         res.render('users/show', {shownUser, phones, buyerHistory, sellerHistory});
     } catch (error) {
         req.flash("error", parseError(error));
@@ -272,7 +272,6 @@ app.post('/auctions/new', async (req, res) => {
     } else {
         procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', NULL)`;
     }
-    console.log(procedureCall);
 
     try {
         await query(procedureCall, procedureParams);
@@ -338,9 +337,9 @@ app.post('/auctions/:id/reviewbuyer', [checkIsLogged, checkIsNotAdmin], async (r
     const auctionId = req.params.id,
         comment = req.body.buyerReviewComment,
         rating = req.body.buyerReviewRating,
-        itemWasSold = (req.body.buyerReviewItemWasSold !== undefined);
+        itemWasSold = ((req.body.buyerReviewItemWasSold !== undefined) ? 'T' : 'F');
     try {
-        await query('CALL updateBuyerReview($1, $2, $3, $4)', [auctionId, comment, rating, itemWasSold]);
+        await query(`CALL updateBuyerReview(${auctionId}, '${comment}', ${rating}, '${itemWasSold}')`);
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.winnerId}`);
     } catch (error) {
@@ -355,7 +354,7 @@ app.post('/auctions/:id/reviewseller', [checkIsLogged, checkIsNotAdmin], async (
         comment = req.body.sellerReviewComment,
         rating = req.body.sellerReviewRating;
     try {
-        await query('CALL updateSellerReview($1, $2, $3)', [auctionId, comment, rating]);
+        await query(`CALL updateSellerReview(${auctionId}, '${comment}', ${rating})`);
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.sellerId}`);
     } catch (error) {
