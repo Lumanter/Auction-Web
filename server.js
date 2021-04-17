@@ -6,7 +6,7 @@ const express = require('express'),
     fileUpload = require('express-fileupload');
 
 const {initializePassport} = require('./passportConfig');
-const {query, parseUser, parseError, parseSellerHistory, parseBuyerHistory, parseAuction} = require('./dbConfig');
+const {query, parseUser, parseError, parseSellerHistory, parseBuyerHistory, parseAuction, parseAuctionInfo, parseDate} = require('./dbConfig');
 const {checkIsLogged, checkIsNotLogged, checkIsAdmin, checkIsNotAdmin} = require('./middleware');
 
     
@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', checkIsNotLogged, (req, res) => {
-    res.render('login', {nickname: 'the_seller'});
+    res.render('login', {nickname: 'the_buyer'});
 });
 
 
@@ -77,7 +77,6 @@ app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
 
 app.post('/params', async (req, res) => {
     const {improvementpercent, minincrement} = req.body;
-    console.log(improvementpercent, ':', minincrement)
     try {
     await query(`CALL createAuctionParameter(${improvementpercent}, ${minincrement})`);
         req.flash("success", "Auction parameters updated!");
@@ -236,7 +235,7 @@ app.post('/auctions', async (req, res) => {
         auctions = await query(`SELECT * FROM getActiveAuctions(${categoryId}, ${subCategoryId})`);
         auctions = auctions.map((auction) => parseAuction(auction));
     } catch (error) {
-        console.log(error.message);
+        console.log(parseError(error));
     }
     res.render('auctions', {auctions, categories, subcategories});
 });
@@ -255,12 +254,7 @@ app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
         });
     } catch (error) {}
 
-    const itemName = 'Scissors', 
-        basePrice = 5000, 
-        itemDescription = 'Good state', 
-        deliveryDetails = 'Heredia', 
-        endDate = '2021-05-22T00:00:00';
-    res.render('auctions/new', {subcategories, itemName, basePrice, itemDescription, deliveryDetails, endDate});
+    res.render('auctions/new', {subcategories});
 });
 
 
@@ -301,11 +295,22 @@ app.post('/auctions/new', async (req, res) => {
 app.get('/auctions/:id', checkIsLogged, async (req, res) => {
     try {
         const auctionId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
-        const auctionInfo = (await query(`SELECT * FROM getAuctionInfo(${auctionId})`)).rows[0];
-        const bids = (await query(`SELECT * FROM getAuctionBids(${auctionId})`)).rows;
+        
+        const auctionInfo = parseAuctionInfo((await query(`SELECT * FROM getAuctionInfo(${auctionId})`))[0]);
+
+        let bids = await query(`SELECT * FROM getAuctionBids(${auctionId})`);
+        bids = bids.map((i) => {
+            return {
+                userid: i.USERID,
+                nickname: i.NICKNAME,
+                amount: i.AMOUNT,
+                date: parseDate(i.DATET)
+            }
+        });
+
         res.render('auctions/show', {...auctionInfo, bids});
     } catch (error) {
-        req.flash("error", error.message);
+        req.flash("error", parseError(error));
         res.redirect('/auctions');
     }
 });
@@ -319,7 +324,7 @@ app.post('/auctions/:id/bid', [checkIsLogged, checkIsNotAdmin], async (req, res)
         await query(`CALL createBid(${userId}, ${bidAmount}, ${auctionId})`);
         req.flash("success", 'Successful bid!');
     } catch (error) {
-        req.flash("error", error.message);
+        req.flash("error", parseError(error));
     }
     res.redirect(`/auctions/${auctionId}`);
 });
@@ -335,7 +340,7 @@ app.post('/auctions/:id/reviewbuyer', [checkIsLogged, checkIsNotAdmin], async (r
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.winnerId}`);
     } catch (error) {
-        req.flash("error", error.message);
+        req.flash("error", parseError(error));
         res.redirect(`/auctions/${auctionId}`);
     }
 });
@@ -350,7 +355,7 @@ app.post('/auctions/:id/reviewseller', [checkIsLogged, checkIsNotAdmin], async (
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.sellerId}`);
     } catch (error) {
-        req.flash("error", error.message);
+        req.flash("error", parseError(error));
         res.redirect(`/auctions/${auctionId}`);
     }
 });

@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-
+oracledb.fetchAsBuffer = [oracledb.BLOB];  // fetch image blobs as buffers
 
 const dbConfig = {
     user: "c##auctionweb",
@@ -96,4 +96,25 @@ function parseAuction(auction) {
 }
 
 
-module.exports = {dbConfig, query, parseUser, parseError, parseDate, parseSellerHistory, parseBuyerHistory, parseAuction};
+function parseAuctionInfo(auction) {
+    return {
+        auctionid: auction.AUCTIONID,
+        itemname: auction.ITEMNAME,
+        subcategoryname: auction.SUBCATEGORYNAME,
+        sellerid: auction.SELLERID,
+        sellernickname: auction.SELLERNICKNAME,
+        baseprice: auction.BASEPRICE,
+        currentprice: auction.CURRENTPRICE,
+        minbid: auction.MINBID,
+        startdate: parseDate(auction.STARTDATE),
+        enddate: parseDate(auction.ENDDATE),
+        itemdescription: auction.ITEMDESCRIPTION,
+        deliverydetails: auction.DELIVERYDETAILS,
+        itemphoto: auction.ITEMPHOTO,
+        isclosed: (auction.ISCLOSED ? auction.ISCLOSED == 'T' : null),
+        winnerid: auction.WINNERID
+    }
+}
+
+
+module.exports = {dbConfig, query, parseUser, parseError, parseDate, parseSellerHistory, parseBuyerHistory, parseAuction, parseAuctionInfo};

@@ -8,7 +8,7 @@
             <% } %>
 
             <% if (itemphoto) { %>
-                <img src="data:image/jpeg;base64,<%= new Buffer.from(itemphoto).toString('base64') %>">
+                <img src="data:image/jpeg;base64,<%= itemphoto.toString('base64') %>">
             <% } %>
         
             <h2 clas><%= itemname %></h2>
@@ -114,7 +114,7 @@
                 <% bids.forEach((bid) => { %>
                     <p class="list-group-item list-group-item-action">
                         <a href="/users/<%= bid.userid %>"><%= bid.nickname %></a> bid <strong>₡<%= bid.amount %></strong>
-                        <small><em>(<%= bid.date.split(' ')[0] %> at <%= bid.date.split(' ')[1].slice(0, -7) %>)</em></small>
+                        <small><em>(<%= bid.date.split(' ')[0] %> at <%= bid.date.split(' ')[1] %>)</em></small>
                     </p>
                 <% }); %>
             </ul>
