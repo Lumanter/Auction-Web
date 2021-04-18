@@ -1,0 +1,126 @@
+<%- include('../partials/header'); %>
+
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-body">
+            <% if (isclosed) { %>
+                <h2 class="alert alert-secondary">CLOSED</h2>
+            <% } %>
+
+            <% if (itemphoto) { %>
+                <img src="data:image/jpeg;base64,<%= itemphoto.toString('base64') %>">
+            <% } %>
+        
+            <h2 clas><%= itemname %></h2>
+            <p><strong>Subcategory:</strong> <%= subcategoryname %></p>
+            <p><strong>Description:</strong> <%= itemdescription %></p>
+            <p><strong>Delivery details:</strong> <%= deliverydetails %></p>
+            <p><strong>Base Price:</strong> ₡<%= baseprice %></p>
+            <p>Active from <em><%= startdate.split(' ')[0] %></em> to <em><%= enddate.split(' ')[0] %></em> at <em><%= enddate.split(' ')[1] %></em></p>
+
+            <div style="text-align: center">
+                <% if (isclosed) { %>
+                    <h3 class="font-weight-normal">Final price: <strong>₡<%= currentprice %></strong></h3>
+                <% } else { %>
+                    <h3 class="font-weight-normal">Current price: <strong>₡<%= currentprice %></strong></h3>
+                    <p>Minimum bid: ₡<%= minbid %></p>
+                <% }  %>
+            </div>
+            
+            <small><em>Created by <a href="/users/<%= sellerid %>"><%= sellernickname %></a></em></small>
+        </div>
+    </div>
+
+    <% if (!isclosed && user.id != sellerid && !user.isadmin) { %>
+        <div class="row justify-content-center mt-2">
+            <form class="form-inline" action="/auctions/<%= auctionid %>/bid" method="POST">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">₡</span>
+                    </div>
+                    <input id="bidamount" type="number" step="any" class="form-control" aria-label="bidamount" name="bidamount" value='<%= minbid %>' required />
+                </div>
+                <button class="btn btn-outline-info ml-2" type="submit">Bid</button>
+            <form>
+        </div>
+    <% } %>
+
+
+    <% if (isclosed && user.id == winnerid) { %>
+        <div class="mt-2 mb-2 card pb-3 pt-3 bg-dark">
+            <form class="form-inline" action="/auctions/<%= auctionid %>/reviewseller" method="POST">
+                <input type="hidden" name="sellerId" value="<%= sellerid %>">
+                <div class="col-4">
+                    <label for="sellerReviewComment" class="form-label justify-content-start text-light"><small>Comment</small></label>
+                    <textarea class="form-control" id="sellerReviewComment" name="sellerReviewComment" rows="3" cols="25" maxLength="120"></textarea>
+                </div>
+
+                <div class="col-2 mb-5">
+                    <label for="sellerReviewRating" class="form-label justify-content-start text-light"><small>Rating</small></label>
+                    <select id="sellerReviewRating" name="sellerReviewRating" class="form-control ">
+                        <option value='0'>0</option>
+                        <option value='1'>1</option>
+                        <option value='2'>2</option>
+                        <option value='3'>3</option>
+                        <option value='4'>4</option>
+                        <option value='5' selected>5</option>
+                    </select>
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-lg btn-outline-light" type="submit">Review Seller</button>
+                </div>
+            <form>
+        </div>
+    <% } %>
+
+
+    <% if (isclosed && winnerid && user.id == sellerid) { %>
+        <div class="mt-2 mb-2 card pb-3 pt-3 bg-dark">
+            <form class="form-inline" action="/auctions/<%= auctionid %>/reviewbuyer" method="POST">
+                <input type="hidden" name="winnerId" value="<%= winnerid %>">
+                <div class="col-4">
+                    <label for="buyerReviewComment" class="form-label justify-content-start text-light"><small>Comment</small></label>
+                    <textarea class="form-control" id="buyerReviewComment" name="buyerReviewComment" rows="3" cols="25" maxLength="120"></textarea>
+                </div>
+
+                <div class="col-2 mb-5">
+                    <label for="buyerReviewRating" class="form-label justify-content-start text-light"><small>Rating</small></label>
+                    <select id="buyerReviewRating" name="buyerReviewRating" class="form-control ">
+                        <option value='0'>0</option>
+                        <option value='1'>1</option>
+                        <option value='2'>2</option>
+                        <option value='3'>3</option>
+                        <option value='4'>4</option>
+                        <option value='5' selected>5</option>
+                    </select>
+                </div>
+
+                <div class="col-2 mb-5">
+                    <label for="buyerReviewItemWasSold" class="form-label justify-content-start text-light"><small>Item sold</small></label>
+                    <input type="checkbox" class="form-check-input mb-3" id="buyerReviewItemWasSold" name="buyerReviewItemWasSold">
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-lg btn-outline-light" type="submit">Review Buyer</button>
+                </div>
+            <form>
+        </div>
+    <% } %>
+
+    <% if (bids !== []) { %>
+        <div class="row justify-content-center mt-2">
+            <ul class="list-group">
+                <% bids.forEach((bid) => { %>
+                    <p class="list-group-item list-group-item-action">
+                        <a href="/users/<%= bid.userid %>"><%= bid.nickname %></a> bid <strong>₡<%= bid.amount %></strong>
+                        <small><em>(<%= bid.date.split(' ')[0] %> at <%= bid.date.split(' ')[1] %>)</em></small>
+                    </p>
+                <% }); %>
+            </ul>
+        </div>
+    <% } %>
+
+</div>
+
+<%- include('../partials/footer'); %>

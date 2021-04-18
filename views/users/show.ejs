@@ -1,0 +1,143 @@
+<%- include('../partials/header'); %>
+
+<div class="container mt-3" style="width: 80%; margin: 25px auto;">
+
+    <div class="card">
+        <h5 class="card-header"><%= shownUser.nickname %></h5>
+        <div class="card-body">
+            <div class="row">
+                <h6 class="col-5 card-title">Id</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.id %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <h6 class="col-5 card-title">Admin</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.isadmin %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <h6 class="col-5 card-title">Email</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.email %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <h6 class="col-5 card-title">First Name</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.firstname %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <h6 class="col-5 card-title">Last Name</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.lastname %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <h6 class="col-5 card-title">Address</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= shownUser.address %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <h6 class="col-5 card-title">Phone</h6>
+                <div class="col-5">
+                    <p class="card-text"><%= phones %></p>
+                </div>
+            </div>
+ 
+            <% if (user.isadmin) { %>
+                <a class="btn btn-outline-info btn-md" href="/users/<%= shownUser.id %>/edit">edit</a>
+            <% } %>
+        </div>
+    </div>
+
+
+    <% if (!shownUser.isadmin) { %>
+        <div class="row mt-2">
+            <div class="col-6">
+                <div class="card">
+                    <h6 class="card-header">Buyer History</h6>
+                    <ul class="list-group list-group-flush">
+                        <% buyerHistory.forEach((bid) => { %>
+                            <li class="list-group-item">
+                                Bid <strong>₡<%= bid.amount %></strong> on <a href="/auctions/<%= bid.auctionid %>"><%= bid.itemname %></a>
+                                <br>
+                                <small>Base price ₡<%= bid.baseprice %></small>
+                                <br>
+                                <small><em><%= bid.biddate.split(' ')[0] %> at <%= bid.biddate.split(' ')[1] %></em></small>
+                                <% if (bid.windate) { %>
+                                    <h5 class="text-center text-warning">Winner bid!</h5>
+                                <% } %>
+                                <% if (bid.sellercomment || bid.sellerrating) { %>
+                                    Seller review: 
+                                    <% if (bid.sellercomment) { %>
+                                        <%= bid.sellercomment %>
+                                    <% } %>
+                                    <% if (bid.sellerrating !== null) { %>
+                                        (<%= bid.sellerrating %>/5)
+                                    <% } %>
+                                <% } %>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-6">
+                <div class="card">
+                    <h6 class="card-header">Seller History</h6>
+                    <ul class="list-group list-group-flush">
+                        <% sellerHistory.forEach((auction) => { %>
+                            <li class="list-group-item">
+                                Created <a href="/auctions/<%= auction.auctionid %>"><%= auction.itemname %></a>
+                                <br>
+                                <small>starting  at ₡<%= auction.baseprice %></small>
+                                <br>
+                                <small><em><%= auction.startdate.split(' ')[0] %> at <%= auction.startdate.split(' ')[1] %></em></small>
+                                <% if (auction.isclosed) { %>
+                                    <% if (auction.buyeruserid) { %>
+                                        <h5 class="text-center text-warning mt-2">Closed with winner</h5>
+                                        <br>
+                                        Winned by <a href="/users/<%= auction.buyeruserid %>"><%= auction.buyernickname %></a> for
+                                        <br>
+                                        <strong>₡<%= auction.amount %></strong>
+                                        
+                                        <% if (auction.itemwassold !== null) { %>
+                                            <br>
+                                            Item sold: <%= auction.itemwassold %>
+                                        <% } %>
+
+                                        <% if (auction.buyercomment || auction.buyerrating) { %>
+                                            <br>
+                                            Buyer review:   
+                                            <% if (auction.buyercomment) { %>
+                                                <%= auction.buyercomment %>
+                                            <% } %>
+                                            <% if (auction.buyerrating !== null) { %>
+                                                (<%= auction.buyerrating %>/5)
+                                            <% } %>
+                                        <% }  %>
+                                    <% } else { %>
+                                        <h5 class="text-center text-secondary">Closed without winner</h5>
+                                    <% }  %>
+
+                                <% } %>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+       
+<%- include('../partials/footer'); %>
