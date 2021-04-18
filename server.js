@@ -118,7 +118,7 @@ app.post('/users', async (req, res) => {
         req.flash("success", `User ${nickname} created`);
         res.redirect(`/users/${id}`);
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
         res.render('users/new', {error: req.flash("error"), id, isAdmin: (isAdmin == 'T'), nickname, email, firstName, lastName, address});  // pass data to restore user form
     }
 });
