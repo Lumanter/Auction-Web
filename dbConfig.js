@@ -43,7 +43,17 @@ function parseError(error) {
 }
 
 
-const parseDate = (date) => date.toISOString().replace('T', ' ').replace('Z', ' ').split('.')[0];
+function adjustHour(timestamp) {  // subtract 6 hours
+    const datePart = timestamp.split(' ')[0];
+    let hour = parseInt(timestamp.split(' ')[1].substring(0, 2));
+    hour -= 6;
+    hour = ((hour < 0) ? hour + 24 : hour);
+    const hourStr = ((hour >= 10) ? hour.toString() : '0' + hour.toString());
+    return datePart + ' ' + hourStr + timestamp.split(' ')[1].substring(2);
+};
+
+
+const parseDate = (date) => adjustHour(date.toISOString().replace('T', ' ').replace('Z', ' ').split('.')[0]);
 
 
 function parseSellerHistory(history) {

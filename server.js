@@ -272,7 +272,7 @@ app.post('/auctions/new', async (req, res) => {
     } else {
         procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', NULL)`;
     }
-
+    
     try {
         await query(procedureCall, procedureParams);
         req.flash("success", `Auction ${itemName} created`);
@@ -300,7 +300,7 @@ app.get('/auctions/:id', checkIsLogged, async (req, res) => {
         const auctionId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
         
         const auctionInfo = parseAuctionInfo((await query(`SELECT * FROM getAuctionInfo(${auctionId})`))[0]);
-
+        
         let bids = await query(`SELECT * FROM getAuctionBids(${auctionId})`);
         bids = bids.map((i) => {
             return {
