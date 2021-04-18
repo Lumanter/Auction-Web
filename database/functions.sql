@@ -1,3 +1,5 @@
+CREATE EXTENSION pgcrypto;
+
 CREATE FUNCTION getMinBid(_auctionId INT) 
 RETURNS NUMERIC(14, 2) AS $$
 DECLARE 
