@@ -1,4 +1,4 @@
---////////////////////////////crypt funtions
+--/function to encrypt password
 create or replace function cryptf( p_str in varchar2 ) return varchar2
   as
       l_data  varchar2(255);
@@ -13,9 +13,8 @@ create or replace function cryptf( p_str in varchar2 ) return varchar2
       return l_data;
   end;
 
-
-create or replace
-  function decryptf( p_str in varchar2 ) return varchar2
+--/function to decryptf password
+create or replace  function decryptf( p_str in varchar2 ) return varchar2
   as
       l_data  varchar2(255);
   begin
@@ -28,7 +27,8 @@ create or replace
   end;
 
 
---//////////////////////////////////////////getMinBid
+--/Funtion to get min Bid
+--/receive the auction id as a parameter
 CREATE OR REPLACE FUNCTION getMinBid(pAuctionId NUMERIC) 
 RETURN numeric
 Is 
@@ -75,8 +75,8 @@ BEGIN
 		END;
 	END IF;
 END;
---/////////////////////////////////////////////////////getActiveAuctions ready
-
+				    
+--/Table to return the output of the function getActiveAuctions
 CREATE TYPE TABLE_ActiveAuctionsRES_OBJ AS OBJECT (
     id              INT,
 	itemName        VARCHAR(60),
@@ -93,10 +93,11 @@ CREATE TYPE TABLE_ActiveAuctionsRES_OBJ AS OBJECT (
 	itemWasSold      CHAR(1) 
     );
 
---Create a type of your object 
+--/Create a type of object TABLE_ActiveAuctionsRES_OBJ
 CREATE TYPE TABLE_ActiveAuctionsRES AS TABLE OF TABLE_ActiveAuctionsRES_OBJ;
 
---Function Use the type created as Return Type
+--/Function to get Active Auctions 
+--/output: a table
 CREATE OR REPLACE FUNCTION getActiveAuctions (  pCategoryId    INT,
                                                 pSubCategoryId INT )
 RETURN TABLE_ActiveAuctionsRES
@@ -147,9 +148,8 @@ BEGIN
    RETURN;
 END;
 
---/////////////////////////////////////////////////////////////////////////////////////////
----////////////////////////////////////////---///////////////////////////////////////////////////////////////GetSellerHistory ready  
--- Create Object of your table
+
+--/Table to return the output of the function GetSellerHistory
 CREATE  TYPE TABLE_SellerHistoryRES_OBJ AS OBJECT (
      auctionId     INT,
 	itemName      VARCHAR(60),
@@ -164,11 +164,11 @@ CREATE  TYPE TABLE_SellerHistoryRES_OBJ AS OBJECT (
 	buyerRating   SMALLINT 
 );
 
---Create a type of your object 
+--/Create a type of object TABLE_SellerHistoryRES_OBJ
 CREATE TYPE TABLE_SellerHistoryRES AS TABLE OF TABLE_SellerHistoryRES_OBJ;
 
-
---Function Use the type created as Return Type
+--/Function to get Seller History
+--/output: a table
 CREATE OR REPLACE FUNCTION getSellerHistory ( pUserId INT )
 RETURN TABLE_SellerHistoryRES
 PIPELINED
@@ -206,12 +206,9 @@ BEGIN
    END LOOP;
    RETURN;
 END;
---///////////////////////////////////////Do not touch
 
 
---//////////////////////////////////////////getBuyerHistory
-
--- Create Object of your table
+--/Table to return the output of the function getBuyerHistory
 CREATE TYPE TABLE_BuyerHistoryRES_OBJ AS OBJECT (
      auctionId     INT,
 	itemName      VARCHAR(60),
@@ -223,11 +220,12 @@ CREATE TYPE TABLE_BuyerHistoryRES_OBJ AS OBJECT (
 	sellerRating  SMALLINT
 );
 
---Create a type of your object 
+--/Create a type of object TABLE_BuyerHistoryRES_OBJ
 CREATE TYPE TABLE_BuyerHistoryRES AS TABLE OF TABLE_BuyerHistoryRES_OBJ;
 
-
---Function Use the type created as Return Type
+--/Function to get Buyer History
+--/imput : user id					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getBuyerHistory ( pUserId INT )
 RETURN TABLE_BuyerHistoryRES
 PIPELINED
@@ -259,12 +257,9 @@ BEGIN
    END LOOP;
    RETURN;
 END;
---///////////////////////////////////////Do not touch
 
 
---/////////////////////////////////////////////////getAuctionBids
-
--- Create Object of your table
+--/Table to return the output of the function getAuctionBids
 CREATE TYPE TABLE_AuctionBidsRES_OBJ AS OBJECT (
     userId    INT,
 	nickname  VARCHAR(20),
@@ -272,10 +267,12 @@ CREATE TYPE TABLE_AuctionBidsRES_OBJ AS OBJECT (
 	dateT      TIMESTAMP
 );
 
---Create a type of your object 
+--/Create a type of object TABLE_AuctionBidsRES_OBJ
 CREATE TYPE TABLE_AuctionBidsRES AS TABLE OF TABLE_AuctionBidsRES_OBJ;
 
---Function Use the type created as Return Type
+--/Function to get Auction Bids
+--/imput : Auction id					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getAuctionBids ( pAuctionId INT )
 RETURN TABLE_AuctionBidsRES
 PIPELINED
@@ -299,21 +296,21 @@ BEGIN
    END LOOP;
    RETURN;
 END;
---/////////////////////////////////////////////////////////don't touch
 
---////////////////////////////////////////////////////////getActiveSubCategories
 
--- Create Object of your table
+--/Table to return the output of the function getActiveSubCategories
 CREATE TYPE TABLE_ActiveSubCategoriesRES_OBJ AS OBJECT (
     id         INT,
 	categoryId INT,
 	name       VARCHAR(250)
 );
 
---Create a type of your object 
+--/Create a type of object TABLE_ActiveSubCategoriesRES_OBJ
 CREATE TYPE TABLE_ActiveSubCategoriesRES AS TABLE OF TABLE_ActiveSubCategoriesRES_OBJ;
 
---Function Use the type created as Return Type
+--/Function to get Active SubCategories
+--/input : Not input					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getActiveSubCategories 
 RETURN TABLE_ActiveSubCategoriesRES
 PIPELINED
@@ -340,22 +337,22 @@ BEGIN
    END LOOP;
    RETURN;
 END;
---////////////////////////////////////////////////////Don't touch
-
---///////////////////////////////////////////////////Getsubcategories
 
 
--- Create Object of your table
+
+--/Table to return the output of the function Getsubcategories
 CREATE TYPE TABLE_SubCategoriesRES_OBJ AS OBJECT (
     id         INT,
 	categoryId INT,
 	name       VARCHAR(250)
 );
-
---Create a type of your object 
+						  
+--/Create a type of object TABLE_SubCategoriesRES_OBJ 
 CREATE TYPE TABLE_SubCategoriesRES AS TABLE OF TABLE_SubCategoriesRES_OBJ;
 
---Function Use the type created as Return Type
+--/Function to get SubCategories
+--/input : Not input					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getSubCategories 
 RETURN TABLE_SubCategoriesRES
 PIPELINED
@@ -380,11 +377,8 @@ BEGIN
    RETURN;
 END;
 
---//////////////////////////////////////////////////////////////////////
 
---////////////////////////////////////////////////////////////////////getAuctionInfo READY
-
--- Create Object of your table
+--/Table to return the output of the function getAuctionInfo
 CREATE OR REPLACE TYPE TABLE_AuctionInfoRES_OBJ AS OBJECT (
   auctionId       INT,
 	itemName        VARCHAR(60),
@@ -403,11 +397,13 @@ CREATE OR REPLACE TYPE TABLE_AuctionInfoRES_OBJ AS OBJECT (
 	winnerId        INT
 );
   
---Create a type of your object 
+--/Create a type of object TABLE_AuctionInfoRES_OBJ
 CREATE TYPE TABLE_AuctionInfoRES AS TABLE OF TABLE_AuctionInfoRES_OBJ;
 DROP TYPE TABLE_AuctionInfoRES
 
-
+--/Function to get Auction Info
+--/input : Auction id					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getAuctionInfo(pId INT)
 RETURN TABLE_AuctionInfoRES
 PIPELINED
@@ -457,13 +453,9 @@ BEGIN
    END IF;
    RETURN;
 END;
---/////////////////////////////////////////////////////////////////////
 
 
------/////////////////////////////////////////////////////////getLoginUser READY
-
-
--- Create Object of your tabledrop type TABLE_LoginUserRES_OBJ force
+--/Table to return the output of the function getLoginUser
 CREATE OR REPLACE TYPE TABLE_LoginUserRES_OBJ AS OBJECT (
     id          INT,
 	isAdmin     char(1) ,   --'T' if is true, 'F' if is false
@@ -475,10 +467,12 @@ CREATE OR REPLACE TYPE TABLE_LoginUserRES_OBJ AS OBJECT (
 	address     VARCHAR(120)
 );
   
---Create a type of your object 
+--/Create a type of object TABLE_LoginUserRES_OBJ
 CREATE TYPE TABLE_LoginUserRES AS TABLE OF TABLE_LoginUserRES_OBJ;
 
-
+--/Function to get Login User
+--/input : user nikcname, user password					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getLoginUser(
                                             pNickname    VARCHAR,
                                             pPassword    VARCHAR)
@@ -528,13 +522,8 @@ BEGIN
    RETURN;
 END;
 
---///////////////////////////////////////////////////////////////
 
-
---///////////////////////////////////////////////////////////////////////getAuctionParameters READY
-
-
--- Create Object of your table
+--/Table to return the output of the function getAuctionParameters
 CREATE OR REPLACE TYPE TABLE_AuctionParametersRES_OBJ AS OBJECT (
     id      INT ,
     improvementPercent  numeric(14,2),
@@ -542,9 +531,12 @@ CREATE OR REPLACE TYPE TABLE_AuctionParametersRES_OBJ AS OBJECT (
 	dateT               TIMESTAMP 
 );
 
---Create a type of your object 
+--/Create a type of object TABLE_AuctionParametersRES_OBJ 
 CREATE TYPE TABLE_AuctionParametersRES AS TABLE OF TABLE_AuctionParametersRES_OBJ;
 
+--/Function to get Auction Parameters
+--/input : Not input					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getAuctionParameters
 RETURN TABLE_AuctionParametersRES
 PIPELINED
@@ -576,15 +568,8 @@ BEGIN
 END;
 
 
---////////////////////////////////////////////////////////////////
 
-
-
------//////////////////////////////////////////////////////getUsers ready
-
-
--- Create Object of your table
-
+--/Table to return the output of the function getUsers
 CREATE TYPE TABLE_UsersRES_OBJ AS OBJECT (
     id          INT ,
 	isAdmin     char(1) ,   --'T' if is true, 'F' if is false
@@ -596,11 +581,12 @@ CREATE TYPE TABLE_UsersRES_OBJ AS OBJECT (
 	address     VARCHAR(120)
 );
 
-
---Create a type of your object 
+--/Create a type of object TABLE_UsersRES_OBJ
 CREATE TYPE TABLE_UsersRES AS TABLE OF TABLE_UsersRES_OBJ;
 
-
+--/Function to get Users
+--/imput :Not input					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getUsers
 RETURN TABLE_UsersRES
 PIPELINED
@@ -635,11 +621,11 @@ BEGIN
     
    RETURN;
 END;
---////////////////////////////////////////////////////////////////////////////////////
-
---///////////////////////////////////////////////////////////////////////get user ready
 
 
+--/Function to get User
+--/imput :User id					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getUser(pId INT)
 RETURN TABLE_UsersRES
 PIPELINED
@@ -685,16 +671,18 @@ END;
 --//////////////////////////////////////////////////////////////getActiveCategories
 
 
--- Create Object of your table
+--/Table to return the output of the function getActiveCategories
 CREATE TYPE TABLE_ActiveCategoriesRES_OBJ AS OBJECT (
     id   INT,
     name VARCHAR(50) 
 );
   
---Create a type of your object 
+--/Create a type of object TABLE_ActiveCategoriesRES_OBJ
 CREATE TYPE TABLE_ActiveCategoriesRES AS TABLE OF TABLE_ActiveCategoriesRES_OBJ;
 
-
+--/Function to get Active Categories
+--/input : Not input					  
+--/output: a table
 CREATE OR REPLACE FUNCTION getActiveCategories
 RETURN TABLE_ActiveCategoriesRES
 PIPELINED
@@ -724,11 +712,9 @@ BEGIN
    RETURN;
 END;
 
-
---/////////////////////////////////////////////////////////////////
---/////////////////////////////////////////////////////////////////get userPhones
-
-
+--/Function to get User Phones
+--/input : User id					  
+--/output:String with all the user's numbers
 CREATE or replace FUNCTION getUserPhones(pUserId INT)
 RETURN String is 
 phones String(500):='';
