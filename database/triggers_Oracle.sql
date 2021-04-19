@@ -1,5 +1,6 @@
+--Trigger that updates the best BID when a new one is inserted
 CREATE or replace TRIGGER updateBestBidTrigger
-BEFORE INSERT ON Bid
+after INSERT ON Bid
 FOR EACH ROW
 BEGIN
 
