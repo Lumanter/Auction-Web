@@ -1,7 +1,4 @@
-execute createUser(201280645,'F','Pepe','12345678','example1@gmail.com','Pepe', 'Aguilar', 'Direccion');
-set serveroutput on
-
-
+--Procedure to create User
 CREATE or replace PROCEDURE createUser(
 	pid          INT, 
 	pisAdmin     char,
@@ -46,9 +43,8 @@ BEGIN
 	END IF;
 END;
 
---Proccedure 2
 
-
+--Procedure to Update User
 CREATE or replace PROCEDURE updateUser(
 	pId         INTEGER,
     pNickname    VARCHAR,
@@ -103,9 +99,9 @@ BEGIN
 		END;
 	END IF;
 END;
---Proccedure 3
 
 
+--Procedure to  create Admin
 CREATE OR REPLACE PROCEDURE createAdmin(
 	pId          INTEGER,
 	pNickname    VARCHAR,
@@ -124,9 +120,7 @@ END;
 
 
 
---Proccedure 5
-
-
+--Procedure to update Admin
 CREATE or replace PROCEDURE updateAdmin(
 	pId          INTEGER,
 	pNickname    VARCHAR,
@@ -145,6 +139,7 @@ END;
 
 
 
+--Procedure to  create Participant
 CREATE or replace PROCEDURE createParticipant(
 	pId          INTEGER,
 	pNickname    VARCHAR,
@@ -163,6 +158,7 @@ END;
 
 
 
+--Procedure to update Participant
 CREATE PROCEDURE updateParticipant(
 	pId          INTEGER,
 	pNickname    VARCHAR,
@@ -179,6 +175,7 @@ BEGIN
 END;
 
 
+--Procedure to update Participant
 CREATE or replace PROCEDURE createAuction(
 	pItemName        VARCHAR,
 	pSubCategoryId   INT,
@@ -234,7 +231,7 @@ END;
 
 
 
-
+--Procedure to create Bid
 CREATE or replace PROCEDURE createBid(
 	pUserId    INT,
 	pAmount    numeric,
@@ -274,7 +271,7 @@ BEGIN
 	END IF;
 END;
 
-
+--Procedure to create Auction Parameter
 CREATE OR REPLACE PROCEDURE createAuctionParameter(
 	pImprovementPercent Numeric,
 	pMinIncrement       Numeric
@@ -307,7 +304,7 @@ BEGIN
 END;
 
 
-
+--Procedure to update Seller Review
 CREATE OR REPLACE PROCEDURE updateSellerReview(
 	pAuctionId INTEGER,
 	pComment   VARCHAR,
@@ -339,7 +336,7 @@ BEGIN
 END;
 
 
-
+--Procedure to update Buyer Review
 CREATE OR REPLACE PROCEDURE updateBuyerReview(
 	pAuctionId   INTEGER,
 	pComment     VARCHAR,
@@ -379,7 +376,7 @@ END;
 
 
 
-
+--Procedure to update Closed Auctions
 CREATE OR REPLACE PROCEDURE updateClosedAuctions
 is
     CountSR int;
@@ -416,6 +413,8 @@ BEGIN
 	END LOOP;
 END;
 
+				   
+--Procedure to create User  Phone				   
 CREATE or replace PROCEDURE createUserPhone(
 	pUserId    INT,
 	pPhone    VARCHAR)
