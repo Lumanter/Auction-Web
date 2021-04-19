@@ -1,5 +1,3 @@
-alter session set "_ORACLE_SCRIPT"=true;
-Create user usuario identified BY "12345";
 
 --Table AuctionParameter
 CREATE TABLE AuctionParameter (
@@ -71,7 +69,7 @@ CREATE TABLE Auction (
 );
 
 
---add auctionId to table Bid
+
 ALTER TABLE Bid ADD auctionId INT REFERENCES Auction NOT NULL;
 
 --Create table SellerReview
