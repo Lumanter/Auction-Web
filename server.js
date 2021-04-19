@@ -66,7 +66,7 @@ app.get('/logout', checkIsLogged, (req, res) => {
 app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let currentParams = null;  // set current params if available
     try {
-        const results = await query('SELECT * FROM getAuctionParameters()');
+        const results = await query('SELECT * FROM c##auctionweb.getAuctionParameters()');
         if (results.length > 0) {
             currentParams = results[0];
         }
@@ -78,7 +78,7 @@ app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
 app.post('/params', async (req, res) => {
     const {improvementpercent, minincrement} = req.body;
     try {
-    await query(`CALL createAuctionParameter(${improvementpercent}, ${minincrement})`);
+    await query(`CALL c##auctionweb.createAuctionParameter(${improvementpercent}, ${minincrement})`);
         req.flash("success", "Auction parameters updated!");
         res.redirect('/auctions');
     } catch (error) {
@@ -91,7 +91,7 @@ app.post('/params', async (req, res) => {
 app.get('/users', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let users = [];
     try {
-        users = await query('SELECT * FROM getUsers()');
+        users = await query('SELECT * FROM c##auctionweb.getUsers()');
         users = users.map((user) => parseUser(user));
     } catch (error) {
         res.send('An error ocurred retrieving the users');
@@ -110,7 +110,7 @@ app.post('/users', async (req, res) => {
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
     const isAdmin = ((req.body.isAdmin !== undefined) ? 'T' : 'F');
 
-    const procedureCall = `CALL createUser(:1, :2, :3, :4, :5, :6, :7, :8)`;
+    const procedureCall = `CALL c##auctionweb.createUser(:1, :2, :3, :4, :5, :6, :7, :8)`;
     const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName, address];
     
     try {
@@ -127,15 +127,15 @@ app.post('/users', async (req, res) => {
 app.get('/users/:id', checkIsLogged, async (req, res) => {
     try {
         const userId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
-        const shownUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
+        const shownUser = parseUser((await query(`SELECT * FROM c##auctionweb.getUser(${userId})`))[0]);
 
-        let phones = (await query(`SELECT getUserPhones(${userId}) FROM DUAL`))[0];
+        let phones = (await query(`SELECT c##auctionweb.getUserPhones(${userId}) FROM DUAL`))[0];
         phones = phones[Object.keys(phones)[0]]; 
 
-        let buyerHistory = await query(`SELECT * FROM getBuyerHistory(${userId})`);
+        let buyerHistory = await query(`SELECT * FROM c##auctionweb.getBuyerHistory(${userId})`);
         buyerHistory = buyerHistory.map((item) => parseBuyerHistory(item));
 
-        let sellerHistory = await query(`SELECT * FROM getSellerHistory(${userId})`);
+        let sellerHistory = await query(`SELECT * FROM c##auctionweb.getSellerHistory(${userId})`);
         sellerHistory = sellerHistory.map((item) => parseSellerHistory(item)); 
 
         res.render('users/show', {shownUser, phones, buyerHistory, sellerHistory});
@@ -149,7 +149,7 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
 app.get('/users/:id/edit', [checkIsLogged, checkIsAdmin], async (req, res) => {
     try {
         const userId = req.params.id;
-        const editUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
+        const editUser = parseUser((await query(`SELECT * FROM c##auctionweb.getUser(${userId})`))[0]);
         res.render('users/edit', {...editUser});
     } catch (error) {
         req.flash("error", parseError(error));
@@ -163,7 +163,7 @@ app.post('/users/:id/phone', [checkIsLogged, checkIsAdmin], async (req, res) => 
     const id = req.params.id;
 
     try {
-        await query(`CALL createUserPhone(${id}, '${phone}')`);
+        await query(`CALL c##auctionweb.createUserPhone(${id}, '${phone}')`);
         req.flash("success", `Phone added`);
         res.redirect(`/users/${id}`);
     } catch (error) {
@@ -177,7 +177,7 @@ app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
     const {nickname, email, password, firstName, lastName, address} = req.body;
     const id = req.params.id;
 
-    const procedureCall = `CALL updateUser(:1, :2, :3, :4, :5, :6, :7)`;
+    const procedureCall = `CALL c##auctionweb.updateUser(:1, :2, :3, :4, :5, :6, :7)`;
     const procedureParams = [id, nickname, password, email, firstName, lastName, address];
 
     try {
@@ -196,15 +196,15 @@ app.get('/auctions', checkIsLogged, async (req, res) => {
         categories = [],
         subcategories = [];
     try {
-        auctions = await query('SELECT * FROM getActiveAuctions(NULL, NULL)');
+        auctions = await query('SELECT * FROM c##auctionweb.getActiveAuctions(NULL, NULL)');
         auctions = auctions.map((auction) => parseAuction(auction));
 
-        categories = await query('SELECT * FROM getActiveCategories()');
+        categories = await query('SELECT * FROM c##auctionweb.getActiveCategories()');
         categories = categories.map((category) => {
             return { id: category.ID, name: category.NAME }
         });
 
-        subcategories = await query('SELECT * FROM getActiveSubCategories()');
+        subcategories = await query('SELECT * FROM c##auctionweb.getActiveSubCategories()');
         subcategories = subcategories.map((subcategory) => {
             return { id: subcategory.ID, categoryid: subcategory.CATEGORYID, name: subcategory.NAME }
         });
@@ -222,12 +222,12 @@ app.post('/auctions', async (req, res) => {
         categories = [],
         subcategories = [];
     try {
-        categories = await query('SELECT * FROM getActiveCategories()');
+        categories = await query('SELECT * FROM c##auctionweb.getActiveCategories()');
         categories = categories.map((category) => {
             return { id: category.ID, name: category.NAME }
         });
 
-        subcategories = await query('SELECT * FROM getActiveSubCategories()');
+        subcategories = await query('SELECT * FROM c##auctionweb.getActiveSubCategories()');
         subcategories = subcategories.map((subcategory) => {
             return { id: subcategory.ID, categoryid: subcategory.CATEGORYID, name: subcategory.NAME }
         });
@@ -244,7 +244,7 @@ app.post('/auctions', async (req, res) => {
 app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
     let subcategories = {};
     try {
-        subcategories = await query('SELECT * FROM getSubCategories()');
+        subcategories = await query('SELECT * FROM c##auctionweb.getSubCategories()');
         subcategories = subcategories.map((i) => {
             return {
                 id: i.ID,
@@ -267,10 +267,10 @@ app.post('/auctions/new', async (req, res) => {
     let procedureParams = [];
     if (req.files) {
         const itemPhoto = req.files.itemPhoto.data;  // image as blob object
-        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', :1)`;
+        procedureCall = `CALL c##auctionweb.createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', :1)`;
         procedureParams = [itemPhoto];
     } else {
-        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', NULL)`;
+        procedureCall = `CALL c##auctionweb.createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', NULL)`;
     }
     
     try {
@@ -280,7 +280,7 @@ app.post('/auctions/new', async (req, res) => {
     } catch (error) {
         let subcategories = [];
         try {
-            subcategories = await query('SELECT * FROM getSubCategories()');
+            subcategories = await query('SELECT * FROM c##auctionweb.getSubCategories()');
             subcategories = subcategories.map((i) => {
                 return {
                     id: i.ID,
@@ -299,9 +299,9 @@ app.get('/auctions/:id', checkIsLogged, async (req, res) => {
     try {
         const auctionId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
         
-        const auctionInfo = parseAuctionInfo((await query(`SELECT * FROM getAuctionInfo(${auctionId})`))[0]);
+        const auctionInfo = parseAuctionInfo((await query(`SELECT * FROM c##auctionweb.getAuctionInfo(${auctionId})`))[0]);
         
-        let bids = await query(`SELECT * FROM getAuctionBids(${auctionId})`);
+        let bids = await query(`SELECT * FROM c##auctionweb.getAuctionBids(${auctionId})`);
         bids = bids.map((i) => {
             return {
                 userid: i.USERID,
@@ -324,7 +324,7 @@ app.post('/auctions/:id/bid', [checkIsLogged, checkIsNotAdmin], async (req, res)
         bidAmount = req.body.bidamount,
         userId = req.user.id;
     try {
-        await query(`CALL createBid(${userId}, ${bidAmount}, ${auctionId})`);
+        await query(`CALL c##auctionweb.createBid(${userId}, ${bidAmount}, ${auctionId})`);
         req.flash("success", 'Successful bid!');
     } catch (error) {
         req.flash("error", parseError(error));
@@ -339,7 +339,7 @@ app.post('/auctions/:id/reviewbuyer', [checkIsLogged, checkIsNotAdmin], async (r
         rating = req.body.buyerReviewRating,
         itemWasSold = ((req.body.buyerReviewItemWasSold !== undefined) ? 'T' : 'F');
     try {
-        await query(`CALL updateBuyerReview(${auctionId}, '${comment}', ${rating}, '${itemWasSold}')`);
+        await query(`CALL c##auctionweb.updateBuyerReview(${auctionId}, '${comment}', ${rating}, '${itemWasSold}')`);
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.winnerId}`);
     } catch (error) {
@@ -354,7 +354,7 @@ app.post('/auctions/:id/reviewseller', [checkIsLogged, checkIsNotAdmin], async (
         comment = req.body.sellerReviewComment,
         rating = req.body.sellerReviewRating;
     try {
-        await query(`CALL updateSellerReview(${auctionId}, '${comment}', ${rating})`);
+        await query(`CALL c##auctionweb.updateSellerReview(${auctionId}, '${comment}', ${rating})`);
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.sellerId}`);
     } catch (error) {

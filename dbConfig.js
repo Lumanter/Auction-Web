@@ -1,18 +1,16 @@
 const oracledb = require('oracledb');
 oracledb.fetchAsBuffer = [oracledb.BLOB];  // fetch image blobs as buffers
 
+
 const dbConfig = {
-    user: "c##auctionweb",
-    password: 'auctionweb',
+    user: "c##auctionwebapp",
+    password: 'auctionwebapp',
     connectString: 'localhost/orcl'
 };
 
+
 async function db() {
-    return await oracledb.getConnection({
-        user: "c##auctionweb",
-        password: 'auctionweb',
-        connectString: 'localhost/orcl'
-    });
+    return await oracledb.getConnection(dbConfig);
 } 
 
 

@@ -6,7 +6,7 @@ const {dbConfig, parseUser, parseError} = require('./dbConfig');
 function authenticateUser(nickname, password, done) {
     oracledb.getConnection(dbConfig, 
         (error, connection) => {
-            connection.execute(`SELECT * FROM getLoginUser(:1, :2)`, [nickname, password], {outFormat: oracledb.OUT_FORMAT_OBJECT},
+            connection.execute(`SELECT * FROM c##auctionweb.getLoginUser(:1, :2)`, [nickname, password], {outFormat: oracledb.OUT_FORMAT_OBJECT},
                 (error, results) => {
                     if (error) {
                         return done(null, false, {message: parseError(error)});
