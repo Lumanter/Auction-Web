@@ -1,23 +1,18 @@
 const LocalStrategy = require('passport-local').Strategy;
-const oracledb = require('oracledb');
-const {dbConfig, parseUser, parseError} = require('./dbConfig');
+const {db} = require('./dbConfig');
+const bcrypt = require('bcrypt');
 
 
 function authenticateUser(nickname, password, done) {
-    oracledb.getConnection(dbConfig, 
-        (error, connection) => {
-            connection.execute(`SELECT * FROM getLoginUser(:1, :2)`, [nickname, password], {outFormat: oracledb.OUT_FORMAT_OBJECT},
-                (error, results) => {
-                    if (error) {
-                        return done(null, false, {message: parseError(error)});
-                    } else {
-                        const user = parseUser(results.rows[0]);
-                        return done(null, user);  // store user in session cookie
-                    }
-                }
-            )
+    db.query(`SELECT * FROM getLoginUser($1, $2)`, [nickname, password],
+    (error, results) => {
+        if (error) {
+            return done(null, false, {message: error.message});
+        } else {
+            const user = results.rows[0];
+            return done(null, user);  // store user in session cookie
         }
-    )
+    });
 };
 
 

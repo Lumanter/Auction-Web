@@ -6,13 +6,12 @@ const express = require('express'),
     fileUpload = require('express-fileupload');
 
 const {initializePassport} = require('./passportConfig');
-const {query, parseUser, parseError, parseSellerHistory, parseBuyerHistory, parseAuction, parseAuctionInfo, parseDate} = require('./dbConfig');
+const {db} = require('./dbConfig');
 const {checkIsLogged, checkIsNotLogged, checkIsAdmin, checkIsNotAdmin} = require('./middleware');
 
     
 initializePassport(passport);  // use custom strategy
     
-
 // MIDDLEWARES
 app.set("view engine", "ejs");  // use ejs
 app.use(express.urlencoded({extended: true}))  // middleware to receive form data in (req.body.param)
@@ -66,9 +65,9 @@ app.get('/logout', checkIsLogged, (req, res) => {
 app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let currentParams = null;  // set current params if available
     try {
-        const results = await query('SELECT * FROM getAuctionParameters()');
-        if (results.length > 0) {
-            currentParams = results[0];
+        const results = await db.query('SELECT * FROM getAuctionParameters()');
+        if (results.rows.length > 0) {
+            currentParams = results.rows[0];
         }
     } catch (error) {}
     res.render('params', {params: currentParams});
@@ -78,12 +77,12 @@ app.get('/params', [checkIsLogged, checkIsAdmin], async (req, res) => {
 app.post('/params', async (req, res) => {
     const {improvementpercent, minincrement} = req.body;
     try {
-    await query(`CALL createAuctionParameter(${improvementpercent}, ${minincrement})`);
+        await db.query('CALL createAuctionParameter($1, $2)', [improvementpercent, minincrement]);
         req.flash("success", "Auction parameters updated!");
         res.redirect('/auctions');
     } catch (error) {
-        req.flash("error", parseError(error));
-        res.render('params', {error: req.flash("error"), params: {IMPROVEMENTPERCENT: improvementpercent, MININCREMENT: minincrement}});
+        req.flash("error", error.message);
+        res.render('params', {error: req.flash("error"), params: {improvementpercent, minincrement}});
     }
 });
 
@@ -91,8 +90,7 @@ app.post('/params', async (req, res) => {
 app.get('/users', [checkIsLogged, checkIsAdmin], async (req, res) => {
     let users = [];
     try {
-        users = await query('SELECT * FROM getUsers()');
-        users = users.map((user) => parseUser(user));
+        users = (await db.query('SELECT * FROM getUsers()')).rows;
     } catch (error) {
         res.send('An error ocurred retrieving the users');
     }
@@ -108,18 +106,18 @@ app.get('/users/new', [checkIsLogged, checkIsAdmin], (req, res) => {
 app.post('/users', async (req, res) => {
     const {nickname, email, password, firstName, lastName, address} = req.body;  // take form data
     const id = (isNaN(parseInt(req.body.id)) ? null : parseInt(req.body.id));
-    const isAdmin = ((req.body.isAdmin !== undefined) ? 'T' : 'F');
+    const isAdmin = (req.body.isAdmin !== undefined);
 
-    const procedureCall = `CALL createUser(:1, :2, :3, :4, :5, :6, :7, :8)`;
+    const procedureCall = `CALL createUser($1, $2, $3, $4, $5, $6, $7, $8)`;
     const procedureParams = [id, isAdmin, nickname, password, email, firstName, lastName, address];
     
     try {
-        await query(procedureCall, procedureParams);
+        await db.query(procedureCall, procedureParams);
         req.flash("success", `User ${nickname} created`);
         res.redirect(`/users/${id}`);
     } catch (error) {
         req.flash("error", error.message);
-        res.render('users/new', {error: req.flash("error"), id, isAdmin: (isAdmin == 'T'), nickname, email, firstName, lastName, address});  // pass data to restore user form
+        res.render('users/new', {error: req.flash("error"), id, isAdmin, nickname, email, firstName, lastName, address});  // pass data to restore user form
     }
 });
 
@@ -127,20 +125,13 @@ app.post('/users', async (req, res) => {
 app.get('/users/:id', checkIsLogged, async (req, res) => {
     try {
         const userId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
-        const shownUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
-
-        let phones = (await query(`SELECT getUserPhones(${userId}) FROM DUAL`))[0];
-        phones = phones[Object.keys(phones)[0]]; 
-
-        let buyerHistory = await query(`SELECT * FROM getBuyerHistory(${userId})`);
-        buyerHistory = buyerHistory.map((item) => parseBuyerHistory(item));
-
-        let sellerHistory = await query(`SELECT * FROM getSellerHistory(${userId})`);
-        sellerHistory = sellerHistory.map((item) => parseSellerHistory(item)); 
-
+        const shownUser = (await db.query(`SELECT * FROM getUser(${userId})`)).rows[0];
+        const phones = (await db.query(`SELECT getUserPhones(${userId})`)).rows[0].getuserphones;
+        const buyerHistory = (await db.query(`SELECT * FROM getBuyerHistory(${userId})`)).rows;
+        const sellerHistory = (await db.query(`SELECT * FROM getSellerHistory(${userId})`)).rows;
         res.render('users/show', {shownUser, phones, buyerHistory, sellerHistory});
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
         res.redirect('/users');
     }
 });
@@ -149,10 +140,10 @@ app.get('/users/:id', checkIsLogged, async (req, res) => {
 app.get('/users/:id/edit', [checkIsLogged, checkIsAdmin], async (req, res) => {
     try {
         const userId = req.params.id;
-        const editUser = parseUser((await query(`SELECT * FROM getUser(${userId})`))[0]);
+        const editUser = (await db.query('SELECT * FROM getUser($1)', [userId])).rows[0];
         res.render('users/edit', {...editUser});
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
         res.redirect('/users');
     }
 });
@@ -163,11 +154,11 @@ app.post('/users/:id/phone', [checkIsLogged, checkIsAdmin], async (req, res) => 
     const id = req.params.id;
 
     try {
-        await query(`CALL createUserPhone(${id}, '${phone}')`);
+        await db.query(`CALL createUserPhone(${id}, '${phone}')`);
         req.flash("success", `Phone added`);
         res.redirect(`/users/${id}`);
     } catch (error) {
-        req.flash("error", parseError(message));
+        req.flash("error", error.message);
         res.redirect(`/users/${id}/edit`)
     }   
 });
@@ -177,15 +168,15 @@ app.post('/users/:id', [checkIsLogged, checkIsAdmin], async (req, res) => {
     const {nickname, email, password, firstName, lastName, address} = req.body;
     const id = req.params.id;
 
-    const procedureCall = `CALL updateUser(:1, :2, :3, :4, :5, :6, :7)`;
+    const procedureCall = `CALL updateUser($1, $2, $3, $4, $5, $6, $7)`;
     const procedureParams = [id, nickname, password, email, firstName, lastName, address];
 
     try {
-        await query(procedureCall, procedureParams);
+        await db.query(procedureCall, procedureParams);
         req.flash("success", `User ${nickname} updated`);
         res.redirect(`/users/${id}`);
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
         res.redirect(`/users/${id}/edit`)
     }
 });
@@ -196,18 +187,9 @@ app.get('/auctions', checkIsLogged, async (req, res) => {
         categories = [],
         subcategories = [];
     try {
-        auctions = await query('SELECT * FROM getActiveAuctions(NULL, NULL)');
-        auctions = auctions.map((auction) => parseAuction(auction));
-
-        categories = await query('SELECT * FROM getActiveCategories()');
-        categories = categories.map((category) => {
-            return { id: category.ID, name: category.NAME }
-        });
-
-        subcategories = await query('SELECT * FROM getActiveSubCategories()');
-        subcategories = subcategories.map((subcategory) => {
-            return { id: subcategory.ID, categoryid: subcategory.CATEGORYID, name: subcategory.NAME }
-        });
+        auctions = (await db.query('SELECT * FROM getActiveAuctions(NULL, NULL)')).rows;
+        categories = (await db.query('SELECT * FROM getActiveCategories()')).rows;
+        subcategories = (await db.query('SELECT * FROM getActiveSubCategories()')).rows;
     } catch (error) {}
     res.render('auctions', {auctions, categories, subcategories});
 });
@@ -218,44 +200,25 @@ app.post('/auctions', async (req, res) => {
     const categoryId = (filterByCategory) ? req.body.category : 'NULL';
     const subCategoryId = (!filterByCategory) ? req.body.subcategory : 'NULL';
 
-    let auctions = [],
-        categories = [],
-        subcategories = [];
+    let auctions = {},
+        categories = {},
+        subcategories = {};
     try {
-        categories = await query('SELECT * FROM getActiveCategories()');
-        categories = categories.map((category) => {
-            return { id: category.ID, name: category.NAME }
-        });
-
-        subcategories = await query('SELECT * FROM getActiveSubCategories()');
-        subcategories = subcategories.map((subcategory) => {
-            return { id: subcategory.ID, categoryid: subcategory.CATEGORYID, name: subcategory.NAME }
-        });
-
-        auctions = await query(`SELECT * FROM getActiveAuctions(${categoryId}, ${subCategoryId})`);
-        auctions = auctions.map((auction) => parseAuction(auction));
+        categories = (await db.query('SELECT * FROM getActiveCategories()')).rows;
+        subcategories = (await db.query('SELECT * FROM getActiveSubCategories()')).rows;
+        auctions = (await db.query(`SELECT * FROM getActiveAuctions(${categoryId}, ${subCategoryId})`)).rows;
     } catch (error) {
-        console.log(parseError(error));
+        console.log(error.message);
     }
     res.render('auctions', {auctions, categories, subcategories});
 });
 
-
 app.get('/auctions/new', [checkIsLogged, checkIsNotAdmin], async (req, res) => {
     let subcategories = {};
     try {
-        subcategories = await query('SELECT * FROM getSubCategories()');
-        subcategories = subcategories.map((i) => {
-            return {
-                id: i.ID,
-                categoryid: i.CATEGORYID,
-                name: i.NAME
-            }
-        });
+        subcategories = (await db.query('SELECT * FROM getSubCategories()')).rows;
     } catch (error) {}
-
     res.render('auctions/new', {subcategories});
-    // res.render('auctions/new', {subcategories, itemName:'t', basePrice:1, itemDescription:'t', deliveryDetails:'t', endDate: '2021-04-17T00:00:00'});
 });
 
 
@@ -263,57 +226,39 @@ app.post('/auctions/new', async (req, res) => {
     const {itemName, subCategoryId, basePrice, itemDescription, deliveryDetails} = req.body;
     const endDate = req.body.endDate.replace('T', ' ');
     const userId = req.user.id;
-    let procedureCall = '';
-    let procedureParams = [];
+    let itemPhoto = null;
     if (req.files) {
-        const itemPhoto = req.files.itemPhoto.data;  // image as blob object
-        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', :1)`;
-        procedureParams = [itemPhoto];
-    } else {
-        procedureCall = `CALL createAuction('${itemName}', ${subCategoryId}, ${userId}, ${basePrice}, TIMESTAMP '${endDate+':00'}', '${itemDescription}', '${deliveryDetails}', NULL)`;
+        itemPhoto = req.files.itemPhoto.data;  // image as blob object (accepted in PostgreSQL BYTEA field)
     }
     
+    const procedureCall = 'CALL createAuction($1, $2, $3, $4, $5, $6, $7, $8);'
+    const procedureParams = [itemName, subCategoryId, userId, basePrice, endDate, itemDescription, deliveryDetails, itemPhoto];
+
     try {
-        await query(procedureCall, procedureParams);
+        await db.query(procedureCall, procedureParams);
         req.flash("success", `Auction ${itemName} created`);
         res.redirect('/auctions');
     } catch (error) {
-        let subcategories = [];
+        let subcategories = {};
         try {
-            subcategories = await query('SELECT * FROM getSubCategories()');
-            subcategories = subcategories.map((i) => {
-                return {
-                    id: i.ID,
-                    categoryid: i.CATEGORYID,
-                    name: i.NAME
-                }
-            });
-        } catch (e) {}
-        req.flash("error", parseError(error));
+            subcategories = (await db.query('SELECT * FROM getSubCategories()')).rows;
+        } catch (error) {}
+
+        req.flash("error", error.message);
         res.render('auctions/new', {error: req.flash("error"), subcategories, itemName, basePrice, itemDescription, deliveryDetails, endDate: endDate.replace(' ', 'T')});
     }
+    
 });
 
 
 app.get('/auctions/:id', checkIsLogged, async (req, res) => {
     try {
         const auctionId = (isNaN(parseInt(req.params.id)) ? 'NULL' : parseInt(req.params.id));
-        
-        const auctionInfo = parseAuctionInfo((await query(`SELECT * FROM getAuctionInfo(${auctionId})`))[0]);
-        
-        let bids = await query(`SELECT * FROM getAuctionBids(${auctionId})`);
-        bids = bids.map((i) => {
-            return {
-                userid: i.USERID,
-                nickname: i.NICKNAME,
-                amount: i.AMOUNT,
-                date: parseDate(i.DATET)
-            }
-        });
-
+        const auctionInfo = (await db.query(`SELECT * FROM getAuctionInfo(${auctionId})`)).rows[0];
+        const bids = (await db.query(`SELECT * FROM getAuctionBids(${auctionId})`)).rows;
         res.render('auctions/show', {...auctionInfo, bids});
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
         res.redirect('/auctions');
     }
 });
@@ -324,10 +269,10 @@ app.post('/auctions/:id/bid', [checkIsLogged, checkIsNotAdmin], async (req, res)
         bidAmount = req.body.bidamount,
         userId = req.user.id;
     try {
-        await query(`CALL createBid(${userId}, ${bidAmount}, ${auctionId})`);
+        await db.query(`CALL createBid(${userId}, ${bidAmount}, ${auctionId})`);
         req.flash("success", 'Successful bid!');
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
     }
     res.redirect(`/auctions/${auctionId}`);
 });
@@ -337,13 +282,13 @@ app.post('/auctions/:id/reviewbuyer', [checkIsLogged, checkIsNotAdmin], async (r
     const auctionId = req.params.id,
         comment = req.body.buyerReviewComment,
         rating = req.body.buyerReviewRating,
-        itemWasSold = ((req.body.buyerReviewItemWasSold !== undefined) ? 'T' : 'F');
+        itemWasSold = (req.body.buyerReviewItemWasSold !== undefined);
     try {
-        await query(`CALL updateBuyerReview(${auctionId}, '${comment}', ${rating}, '${itemWasSold}')`);
+        await db.query('CALL updateBuyerReview($1, $2, $3, $4)', [auctionId, comment, rating, itemWasSold]);
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.winnerId}`);
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
         res.redirect(`/auctions/${auctionId}`);
     }
 });
@@ -354,11 +299,11 @@ app.post('/auctions/:id/reviewseller', [checkIsLogged, checkIsNotAdmin], async (
         comment = req.body.sellerReviewComment,
         rating = req.body.sellerReviewRating;
     try {
-        await query(`CALL updateSellerReview(${auctionId}, '${comment}', ${rating})`);
+        await db.query('CALL updateSellerReview($1, $2, $3)', [auctionId, comment, rating]);
         req.flash("success", 'Review updated');
         res.redirect(`/users/${req.body.sellerId}`);
     } catch (error) {
-        req.flash("error", parseError(error));
+        req.flash("error", error.message);
         res.redirect(`/auctions/${auctionId}`);
     }
 });
